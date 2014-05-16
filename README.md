@@ -126,7 +126,7 @@ Of course, its companion `+keepCache` is used to enable the results cache:
 
     % r +keepCache
     
-Additionally, results in thethe cache can be removed selectively by using the
+Additionally, results in the cache can be removed selectively by using the
 `clearResult` method. This method might be given a specific `cmdId` argument,
 in which case it clears that result. If no argument is given, the whole cache
 is flushed.  Commands still waiting for a response from the server are *not*
