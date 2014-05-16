@@ -239,6 +239,11 @@ Either remove the result of the command identified by ***command identifier*** `
     
 Switch on or off keeping results in the cache after the client has retrieven them using the `result` method. If no argument is given, true is assumed. The `keep` argument can take any form accepted by `[string is boolean]`.
 
+    r async ?async?
+
+Switch on or off the default asynchronous operation mode. If no argument is
+given, true is assumed. The `async` argument can take any form accepted by `[string is boolean]`.
+
     r pipeline script
     
 Execute `script` in the caller scope while holding a Redis pipeline. All Redis commands issued within the `script` are sent over to the server at the end of the script.
