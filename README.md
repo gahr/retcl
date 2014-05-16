@@ -119,7 +119,7 @@ The `keepCache` method accepts an optional boolean argument, which defaults to t
     
 enables the results cache.
 
-Additionally, the cache can be modified by issuing the `clearResult` method. This method might be given a specific a `cmdId` argument, in which case it clears that result. If no argument is given, the whole cache is flushed. Commands still waiting for a response from the server are *not* removed.
+Additionally, the cache can be modified by issuing the `clearResult` method. This method might be given a specific `cmdId` argument, in which case it clears that result. If no argument is given, the whole cache is flushed. Commands still waiting for a response from the server are *not* removed.
 
 **Note:** the `clearResults` method does not care whether the client has retrieved the result, it just checks whether a result has actually been received from the server.
 
