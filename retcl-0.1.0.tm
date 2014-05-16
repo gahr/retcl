@@ -80,6 +80,11 @@ oo::class create retcl {
     variable callbacks
 
     ##
+    # Command prefix to be invoked whenever an error occurs. Defaults to
+    # [error].
+    variable errorCallback
+
+    ##
     # A list of commands inside a pipeline.
     variable pipeline
     variable isPipelined
@@ -103,6 +108,7 @@ oo::class create retcl {
         set pipeline {}
         set isPipelined 0
 
+        my errorHandler
         my connect $host $port
     }
 
@@ -148,6 +154,17 @@ oo::class create retcl {
     # Check whether we're currently connected to a Retcl server.
     method connected {} {
         return [expr {$sock ne {}}]
+    }
+
+    ##
+    # Setup and error callback or restore the default one ([error]). The
+    # cmdPrefix is passed an additional argument containing the error message.
+    method errorHandler {{cmdPrefix {}}} {
+        if {$cmdPrefix eq {}} {
+            set errorCallback error
+        } else {
+            set errorCallback $cmdPrefix
+        }
     }
 
     ##
@@ -628,6 +645,6 @@ oo::class create retcl {
     # Error handler.
     # TODO -- let the client specify a custom error handler.
     method Error {msg} {
-        error $msg
+        {*}$errorCallback $msg
     }
 }

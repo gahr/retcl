@@ -11,6 +11,7 @@ The library consists of a single <a href="http://tcl.tk/man/tcl8.6/TclCmd/tm.htm
 * [The results cache] (#cache)
 * [Commands pipelining] (#pipelining)
 * [Publish / Subscribe and callbacks] (#pubsub)
+* [Handling errors] (#errors)
 * [Reference] (#reference)
 
 <a name="retcl"></a>
@@ -157,6 +158,24 @@ To disable a callback, just call `callback` with an empty *command prefix*. The 
     mycallback 1399644509
 
 
+<a name="errors"></a>
+### Handling errors
+
+By default, errors are handled by calling the standard Tcl `error` command.
+However, errors might be intercepted by setting up an error handler, using the
+method `errorHandler`. The method accepts a *command prefix* which is called
+appending to the list of arguments an error message. In the following example,
+an error handler is setup to disconnect the client whenever an error occurs:
+
+    % proc errcb {obj msg} {
+         puts "ERROR -- $msg"
+         $obj disconnect
+      }
+    % r errorHandler [list errcb r]
+
+The `errorHandler` method might be called without any additional arguments to
+restore the default error handler.
+
 <a name="reference"></a>
 ### Reference
 
@@ -178,6 +197,12 @@ Connect to the server `host` on port `port`.
     r connected
     
 Returns 1 if the client is connected, 0 otherwise.
+
+    r errorHandler ?cmdPrefix?
+
+Setup an error handler to be called whenever an error occurs in the library. If
+no `cmdPrefix` argumet is given, the default error handler `[error]` is
+restored.
 
     r ?-sync? REDIS COMMAND WORDS
     
