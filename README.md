@@ -235,7 +235,7 @@ Retrieve a dictionary where ***command identifiers*** are keys and ***responses*
 
     r clearResult ?cmdId?
     
-Either remove the result of the command identified by ***command identifier*** `cmdId` from the cache. If no `cmdId` is specified, flush the whole cache.
+Either remove the result of the command identified by ***command identifier*** `cmdId` from the cache, or flush the whole cache if no `cmdId` is specified.
 
     r keepCache ?keep?
     
