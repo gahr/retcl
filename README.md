@@ -197,7 +197,7 @@ Either remove the result of the command identified by ***command identifier*** `
 
     r keepCache ?keep?
     
-Switch on or off keeping results in the cache after the client has retrieven them using the `result` method. If not argument is given, true is assumed. The `keep` argument can take any form accepted by `[string is boolean]`.
+Switch on or off keeping results in the cache after the client has retrieven them using the `result` method. If no argument is given, true is assumed. The `keep` argument can take any form accepted by `[string is boolean]`.
 
     r pipeline script
     
