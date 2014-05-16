@@ -137,7 +137,7 @@ Additionally, the cache can be modified by issuing the `clearResult` method. Thi
       }
     almost done...
 
-As shown, the script might contain whatever command is available at the caller scope. Results can the be retrieved with the `allResults` method:
+As shown, the script might contain whatever command is available at the caller scope. Results can then be retrieved with the `allResults` method:
 
     % r allResults
     rds:1 1 rds:2 2 rds:3 3
