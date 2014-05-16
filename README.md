@@ -11,6 +11,7 @@ The library consists of a single <a href="http://tcl.tk/man/tcl8.6/TclCmd/tm.htm
 * [The results cache] (#cache)
 * [Commands pipelining] (#pipelining)
 * [Publish / Subscribe and callbacks] (#pubsub)
+* [Reference] (#reference)
 
 <a name="retcl"></a>
 ### Creating a `retcl` command
@@ -154,3 +155,57 @@ To disable a callback, just call `callback` with an empty *command prefix*. The 
 
     % r callback chan1
     mycallback 1399644509
+
+
+<a name="reference"></a>
+### Reference
+
+    rectl create r
+or
+
+    set red [retcl new ?host? ?port?]
+
+Create an instance of the retcl class in the command r.
+
+    r disconnect
+    
+Disconnect from the server.
+
+    r connect host port
+    
+Connect to the server `host` on port `port`.
+
+    r connected
+    
+Returns 1 if the client is connected, 0 otherwise.
+
+    r ?-sync? REDIS COMMAND WORDS
+    
+Send REDIS COMMAND WORDS over to the Redis server. If the `-sync` argument is specified, wait until a response is available and return it. Otherwise, return a ***command identifier***.
+
+    r result ?-async? cmdId
+    
+Retrieve the result of the command identified by the ***command identifier*** `cmdId`. If the result is not yet available, either wait or return the empty string if `-async` was specified.
+
+    r allResults
+    
+Retrieve a dictionary where ***command identifiers*** are keys and ***responses*** are values.
+
+    r clearResult ?cmdId?
+    
+Either remove the result of the command identified by ***command identifier*** `cmdId` from the cache. If no `cmdId` is specified, flush the whole cache.
+
+    r keepCache ?keep?
+    
+Switch on or off keeping results in the cache after the client has retrieven them using the `result` method. If not argument is given, true is assumed. The `keep` argument can take any form accepted by `[string is boolean]`.
+
+    r pipeline script
+    
+Execute `script` in the caller scope while holding a Redis pipeline. All Redis commands issued within the `script` are sent over to the server at the end of the script.
+
+    r callback item ?cmdPrefix?
+    
+If `cmdPrefix` is specified, setup a command to be called whenever a message arrives on the subscription item `item`. If no `cmdPrefix` is specified, clear a previously setup callback on the same `item`.
+
+
+
