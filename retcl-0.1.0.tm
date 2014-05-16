@@ -57,10 +57,6 @@ oo::class create retcl {
     variable resultsCache
 
     ##
-    # The read state dictionary is used to keep state between read events.
-    variable state 
-
-    ##
     # Read buffer
     variable readBuf
 
@@ -107,7 +103,6 @@ oo::class create retcl {
         set pipeline {}
         set isPipelined 0
 
-        my resetState
         my connect $host $port
     }
 
@@ -115,12 +110,6 @@ oo::class create retcl {
     # Destructor -- disconnect.
     destructor {
         catch {close $sock}
-    }
-
-    ##
-    # Reset the read state.
-    method resetState {} {
-        set state {}
     }
 
     ##
@@ -342,10 +331,6 @@ oo::class create retcl {
         if {$idx != 0} {
             set readBuf [string range $readBuf $idx end]
         }
-    }
-
-    method getbuf {} {
-        return $readBuf
     }
 
     ##
