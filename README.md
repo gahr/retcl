@@ -6,7 +6,13 @@ Tcl client library for Redis
 Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented, <a href="http://redis.io">Redis</a> client library targetting the <a href="http://tcl.tk">Tcl</a> scripting language.
 The library consists of a single <a href="http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9">Tcl Module</a> file, which makes it extremely easy to deploy or integrate into existing projects. 
 
+* [retcl] (#retcl)
+* [Commands identifiers and retrieving results] (#commands)
+* [The results cache] (#cache)
+* [Commands pipelining] (#pipelining)
+* [Publish / Subscribe and callbacks] (#pubsub)
 
+<a name="retcl"></a>
 ### Creating a `retcl` command
 
 First off, require the `retcl` package and create an instance of the `retcl`
@@ -26,6 +32,7 @@ Optionally, the constructor accepts the `host` (defaults to localhost) and `port
 The `r` command (or the `red` variable in the second example) can now be used to issue commands to a Redis server.
 
 
+<a name="commands"></a>
 ### Command identifiers and retrieving results
 
 Redis commands can be invoked as if they were methods of the `retcl` class instance. Commands are issued asynchronously to the Redis server and return immediately.
@@ -78,6 +85,7 @@ The third method available is `allResults`, which returns a dictionary of all av
     rds:1 OK rds:2 val
 
 
+<a name="cache"></a>
 ### The results cache
 
 By default, results are kept in a cache and are *not* deleted after having been retrieved, so it's always possible to query for results of previous commands with the `result` method (this of course doesn't work for commands issued with the `-sync` argument, which do not return a command identifier).
@@ -99,6 +107,7 @@ Additionally, the cache can be modified by issuing the `clearResult` method. Thi
 **Note:** the `clearResults` method does not care whether the client has retrieved the result, it just checks whether a result has actually been received from the server.
 
 
+<a name="pipelining"></a>
 ### Commands pipelining
 
 `retcl` supports the <a href="http://redis.io/topics/pipelining">pipelining</a> of Redis requests. The `pipeline` method accepts a script which is run with pipelining enabled:
@@ -117,6 +126,7 @@ As shown, the script might contain whatever command is available at the caller s
     rds:1 1 rds:2 2 rds:3 3
 
 
+<a name="pubsub"></a>
 ### Publish / subscribe and callbacks
 
 `retcl` exposes the powerful <a href="http://redis.io/topics/pubsub">publish / subscribe semantics</a> in Redis through the `callback` method. The method takes two arguments.
