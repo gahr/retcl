@@ -76,6 +76,21 @@ If this is not the wanted behaviour, the `-async` argument might be used. In thi
     % r result -async $cmdId
     # immediately
 
+Synchronous mode might be turned on by calling the `async` method with a
+`false` argument. This turns off the default asynchronous mode, so redis
+commands are invoked as if the `-sync` option was always specified:
+
+    % r async false
+    false
+    % r GET mykey
+    Some value
+
+To restore default asynchronous operation, call the `async` method either
+without arguments or with a `true` argument:
+
+    % r async
+    true
+
 
 The third method available is `allResults`, which returns a dictionary of all available results where keys are **command identifiers** and values are **results**:
 

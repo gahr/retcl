@@ -67,6 +67,11 @@ oo::class create retcl {
     variable keepCache
 
     ##
+    # Boolean to indicate whether commands are to be sent out in an asynchronous
+    # way (see asynchronous method).
+    variable isAsync
+
+    ##
     # An incremental integer to track requests / responses.
     variable cmdIdNumber
 
@@ -101,6 +106,7 @@ oo::class create retcl {
         }
         set resultsCache [dict create]
         set keepCache 1
+        set isAync 1
         set cmdIdNumber 0
         set sock {}
         set opMode interactive
@@ -165,6 +171,15 @@ oo::class create retcl {
         } else {
             set errorCallback $cmdPrefix
         }
+    }
+
+    ##
+    # Change the asynchronous mode. By default, it turns asynchronous mode off.
+    method async {{async {true}}} {
+        if {![string is boolean $async]} {
+            my Error "async: invalid argument, must be true or false."
+        }
+        set isAsync $async
     }
 
     ##
@@ -293,16 +308,24 @@ oo::class create retcl {
         set cmdId "rds:[incr cmdIdNumber]"
         dict set resultsCache $cmdId status 0
 
+        set sendAsync $isAsync
+
         if {[lindex $args 0] eq {-sync}} {
             # Send synchronously and return the result, when available
-            my Send [lrange $args 1 end]
+            set args [lrange $args 1 end]
+            set sendAsync 0
+        }
+
+        my Send $args
+
+        if {[string is true $sendAsync]} {
+            # Asynchronous send, return the command identifier
+            return $cmdId
+        } else {
+            # Synchronous send, wait for the result and return it
             set res [my result $cmdId]
             r clearResult $cmdId
             return $res
-        } else {
-            # Send asynchronously and return the cmdId
-            my Send $args
-            return $cmdId
         }
     }
 
