@@ -194,12 +194,14 @@ restore the default error handler.
 <a name="reference"></a>
 ### Reference
 
-    rectl create r
+    rectl create r ?host? ?port?
 or
+  
+    set r [retcl new ?host? ?port?]
 
-    set red [retcl new ?host? ?port?]
+Create a retcl object. 
 
-Create an instance of the retcl class in the command r.
+The rest of the Reference assumes that an `r` command exists, as created by `retcl create r`.
 
     r disconnect
     
