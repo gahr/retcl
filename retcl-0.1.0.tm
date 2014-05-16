@@ -62,14 +62,14 @@ oo::class create retcl {
 
     ##
     # Boolean to indicate whether a result should be kept in the results cache
-    # indefinitely (1, default) or automatically removed as soon as it's
-    # retrieved by the client (0)
+    # indefinitely or automatically removed as soon as it's retrieved by the
+    # client(0) (see +keepCache and -keepCache methods)
     variable keepCache
 
     ##
     # Boolean to indicate whether commands are to be sent out in an asynchronous
-    # way (see asynchronous method).
-    variable isAsync
+    # way (see +async and -async methods).
+    variable async
 
     ##
     # An incremental integer to track requests / responses.
@@ -105,8 +105,6 @@ oo::class create retcl {
             *   Array
         }
         set resultsCache [dict create]
-        set keepCache 1
-        set isAync 1
         set cmdIdNumber 0
         set sock {}
         set opMode interactive
@@ -114,6 +112,8 @@ oo::class create retcl {
         set pipeline {}
         set isPipelined 0
 
+        my +keepCache
+        my +async
         my errorHandler
         my connect $host $port
     }
@@ -163,6 +163,35 @@ oo::class create retcl {
     }
 
     ##
+    # Turn on asynchronous operation
+    method +async {} {
+        set async 1
+    }
+    export +async
+
+    ##
+    # Turn off asynchronous operation.
+    method -async {} {
+        set async 0
+    }
+    export -async
+
+    ##
+    # Turn on keeping results in the cache.
+    method +keepCache {} {
+        set keepCache 1
+    }
+    export +keepCache
+
+    ##
+    # Turn off keeping results in the cache.
+    method -keepCache {} {
+        set keepCache 0
+    }
+    export -keepCache
+
+
+    ##
     # Setup and error callback or restore the default one ([error]). The
     # cmdPrefix is passed an additional argument containing the error message.
     method errorHandler {{cmdPrefix {}}} {
@@ -174,15 +203,6 @@ oo::class create retcl {
     }
 
     ##
-    # Change the asynchronous mode. By default, it turns asynchronous mode off.
-    method async {{async {true}}} {
-        if {![string is boolean $async]} {
-            my Error "async: invalid argument, must be true or false."
-        }
-        set isAsync $async
-    }
-
-    ##
     # Get the result of a previously issued command. If the response has not
     # yet arrived, the command waits until it's available, or returns the
     # empty string if -async is given.
@@ -190,14 +210,14 @@ oo::class create retcl {
 
         switch [llength $args] {
             1 {
-                set async 0
+                set asyncArg 0
                 set cmdId $args
             }
             2 {
                 if {[lindex $args 0] ne {-async}} {
                     my Error {wrong # args: should be "result ?-async? cmdId"}
                 }
-                set async 1
+                set asyncArg 1
                 set cmdId [lindex $args 1]
             }
             default {
@@ -212,13 +232,13 @@ oo::class create retcl {
         while {1} {
             if {[dict get $resultsCache $cmdId status] == 1} {
                 set res [dict get $resultsCache $cmdId response]
-                if {[string is false $keepCache]} {
+                if {!$keepCache} {
                     dict unset resultsCache $cmdId
                 }
                 return $res
             }
 
-            if {$async} {
+            if {$asyncArg} {
                 return {}
             }
             vwait [self namespace]::resultsCache
@@ -257,15 +277,6 @@ oo::class create retcl {
             }]
         }
         return {}
-    }
-
-    ##
-    # Change the keep cache mode. By default, it turns cache keeping on.
-    method keepCache {{keep {true}}} {
-        if {![string is boolean $keep]} {
-            my Error "setKeepCache: invalid argument, must be true or false."
-        }
-        set keepCache $keep
     }
 
     ##
@@ -308,7 +319,7 @@ oo::class create retcl {
         set cmdId "rds:[incr cmdIdNumber]"
         dict set resultsCache $cmdId status 0
 
-        set sendAsync $isAsync
+        set sendAsync $async
 
         if {[lindex $args 0] eq {-sync}} {
             # Send synchronously and return the result, when available
@@ -318,7 +329,7 @@ oo::class create retcl {
 
         my Send $args
 
-        if {[string is true $sendAsync]} {
+        if {$sendAsync} {
             # Asynchronous send, return the command identifier
             return $cmdId
         } else {
