@@ -6,7 +6,14 @@ Tcl client library for Redis
 Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented, <a href="http://redis.io">Redis</a> client library targetting the <a href="http://tcl.tk">Tcl</a> scripting language.
 The library consists of a single <a href="http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9">Tcl Module</a> file, which makes it extremely easy to deploy or integrate into existing projects. 
 
+* [retcl] (#retcl)
+* [Commands identifiers and retrieving results] (#commands)
+* [The results cache] (#cache)
+* [Commands pipelining] (#pipelining)
+* [Publish / Subscribe and callbacks] (#pubsub)
+* [Reference] (#reference)
 
+<a name="retcl"></a>
 ### Creating a `retcl` command
 
 First off, require the `retcl` package and create an instance of the `retcl`
@@ -26,6 +33,7 @@ Optionally, the constructor accepts the `host` (defaults to localhost) and `port
 The `r` command (or the `red` variable in the second example) can now be used to issue commands to a Redis server.
 
 
+<a name="commands"></a>
 ### Command identifiers and retrieving results
 
 Redis commands can be invoked as if they were methods of the `retcl` class instance. Commands are issued asynchronously to the Redis server and return immediately.
@@ -78,6 +86,7 @@ The third method available is `allResults`, which returns a dictionary of all av
     rds:1 OK rds:2 val
 
 
+<a name="cache"></a>
 ### The results cache
 
 By default, results are kept in a cache and are *not* deleted after having been retrieved, so it's always possible to query for results of previous commands with the `result` method (this of course doesn't work for commands issued with the `-sync` argument, which do not return a command identifier).
@@ -99,6 +108,7 @@ Additionally, the cache can be modified by issuing the `clearResult` method. Thi
 **Note:** the `clearResults` method does not care whether the client has retrieved the result, it just checks whether a result has actually been received from the server.
 
 
+<a name="pipelining"></a>
 ### Commands pipelining
 
 `retcl` supports the <a href="http://redis.io/topics/pipelining">pipelining</a> of Redis requests. The `pipeline` method accepts a script which is run with pipelining enabled:
@@ -117,6 +127,7 @@ As shown, the script might contain whatever command is available at the caller s
     rds:1 1 rds:2 2 rds:3 3
 
 
+<a name="pubsub"></a>
 ### Publish / subscribe and callbacks
 
 `retcl` exposes the powerful <a href="http://redis.io/topics/pubsub">publish / subscribe semantics</a> in Redis through the `callback` method. The method takes two arguments.
@@ -144,3 +155,57 @@ To disable a callback, just call `callback` with an empty *command prefix*. The 
 
     % r callback chan1
     mycallback 1399644509
+
+
+<a name="reference"></a>
+### Reference
+
+    rectl create r
+or
+
+    set red [retcl new ?host? ?port?]
+
+Create an instance of the retcl class in the command r.
+
+    r disconnect
+    
+Disconnect from the server.
+
+    r connect host port
+    
+Connect to the server `host` on port `port`.
+
+    r connected
+    
+Returns 1 if the client is connected, 0 otherwise.
+
+    r ?-sync? REDIS COMMAND WORDS
+    
+Send REDIS COMMAND WORDS over to the Redis server. If the `-sync` argument is specified, wait until a response is available and return it. Otherwise, return a ***command identifier***.
+
+    r result ?-async? cmdId
+    
+Retrieve the result of the command identified by the ***command identifier*** `cmdId`. If the result is not yet available, either wait or return the empty string if `-async` was specified.
+
+    r allResults
+    
+Retrieve a dictionary where ***command identifiers*** are keys and ***responses*** are values.
+
+    r clearResult ?cmdId?
+    
+Either remove the result of the command identified by ***command identifier*** `cmdId` from the cache. If no `cmdId` is specified, flush the whole cache.
+
+    r keepCache ?keep?
+    
+Switch on or off keeping results in the cache after the client has retrieven them using the `result` method. If no argument is given, true is assumed. The `keep` argument can take any form accepted by `[string is boolean]`.
+
+    r pipeline script
+    
+Execute `script` in the caller scope while holding a Redis pipeline. All Redis commands issued within the `script` are sent over to the server at the end of the script.
+
+    r callback item ?cmdPrefix?
+    
+If `cmdPrefix` is specified, setup a command to be called whenever a message arrives on the subscription item `item`. If no `cmdPrefix` is specified, clear a previously setup callback on the same `item`.
+
+
+
