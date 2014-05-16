@@ -677,7 +677,6 @@ oo::class create retcl {
 
     ##
     # Error handler.
-    # TODO -- let the client specify a custom error handler.
     method Error {msg} {
         {*}$errorCallback $msg
     }
