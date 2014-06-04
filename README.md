@@ -1,3 +1,4 @@
+
 retcl
 =====
 
@@ -171,20 +172,21 @@ method. The method takes two arguments.
 2. a *command prefix*
 
 Upon reception of a message matching `channel` / `pattern`, the *command
-prefix* will be appended the *subscription item* and the message data received
-and will be invoked in the global namespace.
+prefix* will be appended the message type, *subscription item*, actual
+channel, and the message data received and will be invoked in the global
+namespace.
 
-    % proc mycallback {registrationTime channel message} {
-          set elapsed [expr {[clock seconds] - $registrationTime}]
-          puts "It took $elapsed seconds to get $message on channel $channel"
-      }
-    % r callback chan1 [list mycallback [clock seconds]]
-    % r -sync SUBSCRIBE chan1
-    subscribe chan1 1
+    % proc mycallback {registrationTime type pattern channel message} {
+         set elapsed [expr {[clock seconds] - $registrationTime}]
+         puts "After $elapsed seconds I got a message of type $type on my registration channel $pattern. The actual channel was $channel. The message is $message."
+     }
+    % r callback chan* [list mycallback [clock seconds]]
+    % r PSUBSCRIBE chan*
+    After 3 seconds I got a message of type psubscribe on my registration channel chan*. The actual channel was chan*. The message is 1.
     
 Some time later somebody sends "Hello!" on chan1.
 
-    It took 35 seconds to get Hello! on channel chan1
+    After 29 seconds I got a message of type pmessage on my registration channel chan*. The actual channel was chan1. The message is Hello!.
     
 **Note:** as shown in the previous code snipped, registering a callback does
 *not* automatically send a (P)SUBSCRIBE request to the Redis server.
@@ -290,4 +292,9 @@ the script.
     
 If `cmdPrefix` is specified, setup a command to be called whenever a message
 arrives on the subscription item `item`. If no `cmdPrefix` is specified, clear
-a previously setup callback on the same `item`.
+a previously setup callback on the same `item`. `cmdPrefix` is appended the following arguments:
+
+1. message type (message, pmessage, subscribe, unsubscribe, ...)
+2. subscription item (channel or pattern subscribed / unsubscribed to)
+3. actual channel (channel or pattern where the message was sent)
+4. body
