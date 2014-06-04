@@ -126,7 +126,7 @@ oo::class create retcl {
 
     ##
     # Connect to a Retcl server.
-    method connect {host port} {
+    method connect {{host 127.0.0.1} {port 6379}} {
         if {$sock ne {}} {
             my Error "Already connected"
         }
