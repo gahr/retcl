@@ -48,11 +48,11 @@ oo::class create retcl {
     # to the server is assigned a unique identifier, which can be then used by
     # the user to retrieve the result (see [result] method).  The resultsCache
     # variable is a dictionary where unique identifiers are the keys, with
-    # further keys for status, request, and response.  Status is either 0 (not
-    # replied) or 1 (replied). New requests are appended at the tail of the
-    # list; responses are inserted at the first request with a status 0.
+    # further keys for status, and response.  Status is either 0 (not replied)
+    # or 1 (replied). New commands are appended at the tail of the list;
+    # responses are inserted at the first command with a status 0.
     #
-    # (cmd1 {status (0|1) request (COMMAND) response (RESPONSE)})
+    # (cmd1 {status (0|1) response (RESPONSE)})
     #
     variable resultsCache
 
@@ -316,8 +316,19 @@ oo::class create retcl {
     ##
     # The unknown handler handles unknown methods as Redis commands
     method unknown {args} {
-        set cmdId "rds:[incr cmdIdNumber]"
-        dict set resultsCache $cmdId status 0
+
+        if {![llength $args]} {
+            return
+        }
+
+        if {[string tolower [lindex $args 0]] in {psubscribe punsubscribe subscribe unsubscribe}} {
+            # These messages are part of the Pub/Sub protocol; we don't expect
+            # a response.
+            set cmdId {}
+        } else {
+            set cmdId "rds:[incr cmdIdNumber]"
+            dict set resultsCache $cmdId status 0
+        }
 
         set sendAsync $async
 
@@ -329,7 +340,7 @@ oo::class create retcl {
 
         my Send $args
 
-        if {$sendAsync} {
+        if {$sendAsync || $cmdId eq {}} {
             # Asynchronous send, return the command identifier
             return $cmdId
         } else {
@@ -498,19 +509,35 @@ oo::class create retcl {
 
     ##
     # Handle a complete result read from the server.
-    method HandleResult {type body} {
-        # If the response is a message (pub/sub), deliver it to the
+    method HandleResult {type body} { 
+        # We have to handle two distinct cases:
+        # - a pushed message (can be message, subscribe, or ubsubscribe)
+        # - a command response
+        #
+        # The first case is handled by forwarding the message contents to a
+        # registered callback, if any exists. For message types we're done. For
+        # subscribe / unsubscribe types we also have to locate the
+        # corresponding request and clear it.
+        #
+        # The second case is handled by locating the corresponding request and
+        # filling in the result.
+
+        # If the response is a pushed message
         # relevant callback, if any.
-        if {$type eq {Array} && [lindex $body 0] eq {message}} {
-            lassign $body _ item data
+        if {$type eq {Array} && [lindex $body 0] in {message pmessage psubscribe punsubscribe subscribe unsubscribe}} {
+            if {[lindex $body 0] eq {pmessage}} {
+                lassign $body type pattern item data
+            } else {
+                lassign $body type item data
+                set pattern $item
+            }
             try {
-                dict get $callbacks $item
-            } on error {} {
-                # no callback defined, just ignore this message
-                return
+                dict get $callbacks $pattern
             } on ok callback {
-                namespace eval :: $callback $item $data
+                namespace eval :: $callback $type $pattern $item $data
             } finally {
+                # It's a subscribe / unsubscribe. Clear the corresponding
+                # request, if any.
                 return
             }
         }

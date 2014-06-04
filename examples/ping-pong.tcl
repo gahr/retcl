@@ -1,38 +1,39 @@
 ##
-# Simple ping-pong game using Redis' Pub/Sub paradigm.
+# Simple ping-pong game using Redis' Pub/Sub paradigm. Look at PING and PONG
+# messages go around over the chon and chin channels, respectively.
 #
-# Call the script twice, the first time giving the PONG argument, the second
-# time giving the PING argument.
-#
-# $ tclsh ping-pong.tcl PONG &
-# $ tclsh ping-pong.tcl PING &
-#
-# and look at the two clients sending and receiving messages.
-#
-
 tcl::tm::path add ..
 package require retcl
 
-retcl create r
+set chans {chin chon}
+set texts {PING PONG}
 
-proc pingpong {channel msg} {
-    puts "[clock format [clock seconds]] $msg"
+proc pingpong {r id type pattern channel msg} {
+    if {$type ne {message}} {
+        return
+    }
+    puts "[clock format [clock seconds]] $channel/$msg"
+
     after 1000
-    r UNSUBSCRIBE [lindex $::chans 1]
-    r PUBLISH [lindex $::chans 0] $::msg
-    r SUBSCRIBE [lindex $::chans 1]
+    $r UNSUBSCRIBE [lindex $::chans $id]
+    $r PUBLISH [lindex $::chans [expr {!$id}]] [lindex $::texts $id]
+    $r SUBSCRIBE [lindex $::chans $id]
 }
 
-set isPing [expr {[lindex $argv 0] eq {PING}}]
+proc run {id} {
 
-set chans [expr {$isPing ? {chan1 chan2} : {chan2 chan1}}]
-set msg   [expr {$isPing ? {PING} : {PONG}}]
+    set r [retcl new]
+    $r callback [lindex $::chans $id] [list pingpong $r $id]
 
-r callback [lindex $chans 1] pingpong
+    if {$id == 0} {
+        $r PUBLISH [lindex $::chans [expr {!$id}]] [lindex $::texts $id]
+    }
 
-if {$isPing} {
-    r PUBLISH [lindex $chans 0] PING
+    $r SUBSCRIBE [lindex $::chans $id]
 }
-r SUBSCRIBE [lindex $chans 1]
+
+run 1
+after 1000
+run 0
 
 vwait forever
