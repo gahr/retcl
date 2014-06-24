@@ -133,7 +133,7 @@ in which case it clears that result. If no argument is given, the whole cache
 is flushed.  Commands still waiting for a response from the server are *not*
 removed.
 
-**Note:** the `clearResults` method does not care whether the client has
+**Note:** the `clearResult` method does not care whether the client has
 retrieved the result, it just checks whether a result has actually been
 received from the server.
 
