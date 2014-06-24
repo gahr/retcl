@@ -32,10 +32,6 @@ package provide retcl 0.1.0
 
 catch {retcl destroy}
 
-proc DEBUG {args} {
-    puts "$args"
-}
-
 oo::class create retcl {
 
     ##
