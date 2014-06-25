@@ -530,7 +530,7 @@ oo::class create retcl {
             try {
                 dict get $callbacks $pattern
             } on ok callback {
-                namespace eval :: $callback $type $pattern $item $data
+                namespace eval :: [list $callback $type $pattern $item $data]
             } finally {
                 # It's a subscribe / unsubscribe. Clear the corresponding
                 # request, if any.
