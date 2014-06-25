@@ -342,7 +342,7 @@ oo::class create retcl {
         } else {
             # Synchronous send, wait for the result and return it
             set res [my result $cmdId]
-            r clearResult $cmdId
+            my clearResult $cmdId
             return $res
         }
     }
