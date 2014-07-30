@@ -72,6 +72,12 @@ oo::class create retcl {
     variable cmdIdNumber
 
     ##
+    # The Redis server host and port, as used in the constructor or in the
+    # connect method.
+    variable host
+    variable port
+
+    ##
     # The socket used to connect to the server
     variable sock
 
@@ -121,11 +127,14 @@ oo::class create retcl {
     }
 
     ##
-    # Connect to a Retcl server.
-    method connect {{host 127.0.0.1} {port 6379}} {
+    # Connect to a Redis server.
+    method connect {{a_host 127.0.0.1} {a_port 6379}} {
         if {$sock ne {}} {
             my Error "Already connected"
         }
+
+        set host $a_host
+        set port $a_port
 
         set sock [socket $host $port]
         #chan configure $sock -blocking 0 -buffering line -encoding binary -translation binary
@@ -134,21 +143,18 @@ oo::class create retcl {
     }
 
     ##
-    # Disconnect from the Retcl server.
-    method disconnect {} {
-        if {$sock eq {}} {
-            my Error "Not connected"
-        }
-
-        # Cleanup the socket
+    # Reconnect to the Redis server. This tries to reconnect waiting up to 30
+    # seconds in total.
+    method reconnect {{i 0}} {
         catch {close $sock}
         set sock {}
-
-        # Cleanup the resultsCache: all requests without a response
-        # will be filled with an "Error: disconnected" response.
-        foreach cmdId [my FindPendingRequest] {
-            dict set resultsCache $cmdId status 1
-            dict set resultsCache $cmdId response "Error: disconnected"
+        if {$i == 10} {
+            my Error {Could not reconnect to Redis server}
+            return
+        }
+        if {[catch {my connect $host $port} err]} {
+            after 3000 [list [self object] reconnect [incr i]]
+            return
         }
     }
 
@@ -369,8 +375,8 @@ oo::class create retcl {
     # Handle a read event from the socket.
     method readEvent {} {
         if {[chan eof $sock]} {
-            my disconnect
-            my Error "Connection lost"
+            my reconnect
+            return
         }
 
         append readBuf [read $sock]
