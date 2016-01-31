@@ -451,7 +451,7 @@ oo::class create retcl {
                 # Non-empty Bulk String
                 incr eol 2
                 set endIdx [expr {$eol+$bulkLen-1}]
-                if {[string length $buffer] < $endIdx} {
+                if {[string length $buffer] < [expr {$endIdx+2}]} {
                     # Need to wait for more input
                     return
                 }
