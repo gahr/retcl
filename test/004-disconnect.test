@@ -1,0 +1,7 @@
+tcltest::test disconnect-1.1 {disconnect} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r disconnect
+}

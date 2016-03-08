@@ -1,0 +1,33 @@
+tcltest::test set-1.1 {set async} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    set cmdId [$r SET key1 value1]
+    $r result $cmdId
+} -result OK
+
+tcltest::test set-1.2 {set sync} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r -sync SET key2 value2
+} -result OK
+
+tcltest::test get-1.1 {get async} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    set cmdId [$r GET key1]
+    $r result $cmdId
+} -result value1
+
+tcltest::test get-1.2 {get sync} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r -sync GET key2
+} -result value2
