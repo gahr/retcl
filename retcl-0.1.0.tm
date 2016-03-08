@@ -146,8 +146,7 @@ oo::class create retcl {
     # Reconnect to the Redis server. This tries to reconnect waiting up to 30
     # seconds in total.
     method reconnect {{i 0}} {
-        catch {close $sock}
-        set sock {}
+        my disconnect
         if {$i == 10} {
             my Error {Could not reconnect to Redis server}
             return
@@ -162,6 +161,13 @@ oo::class create retcl {
     # Check whether we're currently connected to a Retcl server.
     method connected {} {
         return [expr {$sock ne {}}]
+    }
+
+    ##
+    # Disconnect from the Redis server.
+    method disconnect {} {
+        catch {close $sock}
+        set sock {}
     }
 
     ##
