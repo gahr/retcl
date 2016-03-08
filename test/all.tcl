@@ -1,0 +1,17 @@
+package require Tcl 8.6
+package require tcltest 2.3
+
+tcl::tm::path add [file join [file dirname [info script]] .. ]
+package require retcl
+
+tcltest::configure {*}$argv -singleproc 1 -testdir [file dir [info script]]
+
+# Check that the server is up and running
+if {[catch {socket localhost 6379} fd]} {
+    tcltest::testConstraint serverIsRunning 0
+} else {
+    tcltest::testConstraint serverIsRunning 1
+    close $fd
+}
+
+tcltest::runAllTests

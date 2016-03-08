@@ -1,0 +1,15 @@
+tcltest::test construct-1.1 {retcl create} -constraints {
+    serverIsRunning
+} -body {
+    retcl create r
+    info commands r
+} -cleanup {
+    rename r {}
+} -result r
+
+tcltest::test construct-1.2 {retcl new} -constraints {
+    serverIsRunning
+} -body {
+    set r [retcl new]
+    info object class $r
+} -result ::retcl
