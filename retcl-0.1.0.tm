@@ -1,5 +1,5 @@
 ##
-# Copyright (C) 2014 Pietro Cerutti <gahr@gahr.ch>
+# Copyright (C) 2014-2016 Pietro Cerutti <gahr@gahr.ch>
 # 
 # Retcltribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
