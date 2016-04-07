@@ -1,0 +1,21 @@
+tcltest::test resultReady-1.1 {resultReady not yet} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r resultReady [$r PING]
+} -result {0}
+
+tcltest::test resultReady-1.2 {resultReady after event loop} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    set res [$r PING]
+    set done 0
+    after 100 {
+        set done 1
+    }
+    vwait done
+    $r resultReady $res
+} -result {1}

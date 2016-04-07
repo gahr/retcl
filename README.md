@@ -89,6 +89,19 @@ string:
     % r result -async $cmdId
     # immediately
 
+The readyness of a result can be query with the `resultReady` method, which
+returns a boolean indicating whether a response for the result is available:
+
+    % r PING
+    rds:1
+    % r resultReady rds:1
+    0
+    % set done 0
+    % after 100 { set done 1 }
+    % vwait done
+    % r resultReady rds:1
+    1
+
 The asynchronous operation mode can be turned off (and back on) using the pair
 of methods `-async` and `+async`. When the asynchronous mode is disabled,
 Redis commands are executed and their results returned as soon as they are
