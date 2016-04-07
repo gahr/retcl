@@ -254,6 +254,15 @@ oo::class create retcl {
     }
 
     ##
+    # Check whether a result is ready for retrieval.
+    method resultReady {cmdId} {
+        if {![dict exists $resultsCache $cmdId]} {
+            my Error "Invalid command id: $cmdId"
+        }
+        dict get $resultsCache $cmdId status
+    }
+
+    ##
     # Return a dictionary of the reuslts in form
     # of cmdId =>  result.
     method allResults {} {
