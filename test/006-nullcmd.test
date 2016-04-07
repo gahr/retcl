@@ -1,0 +1,7 @@
+tcltest::test nullcmd-1.1 {nullcmd} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r -sync
+} -result {}

@@ -329,6 +329,17 @@ oo::class create retcl {
             return
         }
 
+        set sendAsync $async
+
+        if {[lindex $args 0] eq {-sync}} {
+            # Send synchronously and return the result, when available
+            set args [lrange $args 1 end]
+            if {![llength $args]} {
+                return
+            }
+            set sendAsync 0
+        }
+
         if {[string tolower [lindex $args 0]] in {psubscribe punsubscribe subscribe unsubscribe}} {
             # These messages are part of the Pub/Sub protocol; we don't expect
             # a response.
@@ -336,14 +347,6 @@ oo::class create retcl {
         } else {
             set cmdId "rds:[incr cmdIdNumber]"
             dict set resultsCache $cmdId status 0
-        }
-
-        set sendAsync $async
-
-        if {[lindex $args 0] eq {-sync}} {
-            # Send synchronously and return the result, when available
-            set args [lrange $args 1 end]
-            set sendAsync 0
         }
 
         my Send $args
