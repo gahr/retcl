@@ -123,7 +123,7 @@ oo::class create retcl {
     ##
     # Destructor -- disconnect.
     destructor {
-        catch {close $sock}
+        my disconnect
     }
 
     ##
@@ -149,7 +149,6 @@ oo::class create retcl {
         my disconnect
         if {$i == 10} {
             my Error {Could not reconnect to Redis server}
-            return
         }
         if {[catch {my connect $host $port} err]} {
             after 3000 [list [self object] reconnect [incr i]]
@@ -168,6 +167,7 @@ oo::class create retcl {
     method disconnect {} {
         catch {close $sock}
         set sock {}
+        set resultsCache [dict create]
     }
 
     ##
@@ -249,7 +249,12 @@ oo::class create retcl {
             if {$asyncArg} {
                 return {}
             }
+
             vwait [self namespace]::resultsCache
+
+            if {![my connected]} {
+                my Error {Disconnected}
+            }
         }
     }
 
@@ -393,7 +398,7 @@ oo::class create retcl {
     # Handle a read event from the socket.
     method readEvent {} {
         if {[chan eof $sock]} {
-            my reconnect
+            my disconnect
             return
         }
 
@@ -726,6 +731,7 @@ oo::class create retcl {
     # Error handler.
     method Error {msg} {
         {*}$errorCallback $msg
+        return -level 2
     }
 }
 
