@@ -728,3 +728,5 @@ oo::class create retcl {
         {*}$errorCallback $msg
     }
 }
+
+# vim: set ft=tcl ts=4 expandtab:
