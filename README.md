@@ -195,7 +195,7 @@ namespace.
     % proc mycallback {registrationTime type pattern channel message} {
          set elapsed [expr {[clock seconds] - $registrationTime}]
          puts "After $elapsed seconds I got a message of type $type"
-         puts "on my registration channel $pattern.
+         puts "on my registration channel $pattern."
          puts "The actual channel was $channel. The message is $message."
      }
     % r callback chan* [list mycallback [clock seconds]]
