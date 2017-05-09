@@ -4,11 +4,7 @@ retcl
 
 Tcl client library for Redis
 
-Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented,
-[Redis] (http://redis.io) client library targetting the [Tcl]
-(http://tcl.tk) scripting language.  The library consists of a single
-[Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file, which
-makes it extremely easy to deploy or integrate into existing projects. 
+Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented, [Redis](http://redis.io) client library targetting the [Tcl](http://tcl.tk) scripting language.  The library consists of a single [Tcl Module](http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file, which makes it extremely easy to deploy or integrate into existing projects. 
 
 * [retcl](#retcl)
 * [Commands identifiers and retrieving results](#commands)
@@ -158,7 +154,7 @@ received from the server.
 <a name="pipelining"></a>
 ### Commands pipelining
 
-`retcl` supports the [pipelining] (http://redis.io/topics/pipelining) of Redis
+`retcl` supports the [pipelining](http://redis.io/topics/pipelining) of Redis
 requests. The `pipeline` method accepts a script which is run with pipelining
 enabled:
 
@@ -180,9 +176,8 @@ scope. Results can then be retrieved with the `allResults` method:
 <a name="pubsub"></a>
 ### Publish / subscribe and callbacks
 
-`retcl` exposes the powerful [publish / subscribe]
-(http://redis.io/topics/pubsub) semantics in Redis through the `callback`
-method. The method takes two arguments.
+`retcl` exposes the powerful [publish / subscribe](http://redis.io/topics/pubsub)
+semantics in Redis through the `callback` method. The method takes two arguments.
 
 1. a *subscription item*, matching either a `channel` argument to `SUBSCRIBE`
    or a `pattern` argument to `PSUBSCRIBE`
