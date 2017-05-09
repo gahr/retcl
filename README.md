@@ -4,7 +4,11 @@ retcl
 
 Tcl client library for Redis
 
-Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented, [Redis](http://redis.io) client library targetting the [Tcl](http://tcl.tk) scripting language.  The library consists of a single [Tcl Module](http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file, which makes it extremely easy to deploy or integrate into existing projects. 
+Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented,
+[Redis](http://redis.io) client library targetting the [Tcl](http://tcl.tk)
+scripting language.  The library consists of a single
+[Tcl Module](http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file, which makes it
+extremely easy to deploy or integrate into existing projects. 
 
 * [retcl](#retcl)
 * [Commands identifiers and retrieving results](#commands)
@@ -190,15 +194,21 @@ namespace.
 
     % proc mycallback {registrationTime type pattern channel message} {
          set elapsed [expr {[clock seconds] - $registrationTime}]
-         puts "After $elapsed seconds I got a message of type $type on my registration channel $pattern. The actual channel was $channel. The message is $message."
+         puts "After $elapsed seconds I got a message of type $type"
+         puts "on my registration channel $pattern.
+         puts "The actual channel was $channel. The message is $message."
      }
     % r callback chan* [list mycallback [clock seconds]]
     % r PSUBSCRIBE chan*
-    After 3 seconds I got a message of type psubscribe on my registration channel chan*. The actual channel was chan*. The message is 1.
+    After 3 seconds I got a message of type psubscribe
+    on my registration channel chan*.
+    The actual channel was chan*. The message is 1.
     
 Some time later somebody sends "Hello!" on chan1.
 
-    After 29 seconds I got a message of type pmessage on my registration channel chan*. The actual channel was chan1. The message is Hello!.
+    After 29 seconds I got a message of type pmessage
+    on my registration channel chan*.
+   The actual channel was chan1. The message is Hello!.
     
 **Note:** as shown in the previous code snipped, registering a callback does
 *not* automatically send a (P)SUBSCRIBE request to the Redis server.
@@ -304,7 +314,8 @@ the script.
     
 If `cmdPrefix` is specified, setup a command to be called whenever a message
 arrives on the subscription item `item`. If no `cmdPrefix` is specified, clear
-a previously setup callback on the same `item`. `cmdPrefix` is appended the following arguments:
+a previously setup callback on the same `item`. `cmdPrefix` is appended the
+following arguments:
 
 1. message type (message, pmessage, subscribe, unsubscribe, ...)
 2. subscription item (channel or pattern subscribed / unsubscribed to)
