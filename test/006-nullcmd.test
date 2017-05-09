@@ -4,4 +4,6 @@ tcltest::test nullcmd-1.1 {nullcmd} -constraints {
     set r [retcl new]
 } -body {
     $r -sync
+} -cleanup {
+    $r destroy
 } -result {}
