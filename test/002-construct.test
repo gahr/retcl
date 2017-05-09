@@ -12,4 +12,6 @@ tcltest::test construct-1.2 {retcl new} -constraints {
 } -body {
     set r [retcl new]
     info object class $r
+} -cleanup {
+    $r destroy
 } -result ::retcl

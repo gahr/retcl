@@ -4,6 +4,8 @@ tcltest::test connect-1.1 {connect when already connected} -constraints {
     set r [retcl new]
 } -body {
     $r connect
+} -cleanup {
+    $r destroy
 } -returnCodes {
     error
 } -result {Already connected}
@@ -15,4 +17,16 @@ tcltest::test connect-1.2 {connect after disconnect} -constraints {
 } -body {
     $r disconnect
     $r connect
+} -cleanup {
+    $r destroy
 }
+
+tcltest::test connect-1.3 {connected says 1} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r connected
+} -cleanup {
+    $r destroy
+} -result {1}

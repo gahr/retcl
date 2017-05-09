@@ -4,6 +4,8 @@ tcltest::test resultReady-1.1 {resultReady not yet} -constraints {
     set r [retcl new]
 } -body {
     $r resultReady [$r PING]
+} -cleanup {
+    $r destroy
 } -result {0}
 
 tcltest::test resultReady-1.2 {resultReady after event loop} -constraints {
@@ -18,4 +20,6 @@ tcltest::test resultReady-1.2 {resultReady after event loop} -constraints {
     }
     vwait done
     $r resultReady $res
+} -cleanup {
+    $r destroy
 } -result {1}

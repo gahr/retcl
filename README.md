@@ -39,6 +39,10 @@ Optionally, the constructor accepts the `host` (defaults to localhost) and
 The `r` command (or the `red` variable in the second example) can now be used
 to issue commands to a Redis server.
 
+The lifetime of the `r` command must be managed by the caller. The object must
+be explicitely destroyed via a call to `r destroy` (or `$red destroy`) to avoid
+resource leaks.
+
 
 <a name="commands"></a>
 ### Command identifiers and retrieving results

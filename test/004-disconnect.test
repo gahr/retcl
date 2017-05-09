@@ -4,4 +4,7 @@ tcltest::test disconnect-1.1 {disconnect} -constraints {
     set r [retcl new]
 } -body {
     $r disconnect
-}
+    $r connected
+} -cleanup {
+    $r destroy
+} -result {0}

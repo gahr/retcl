@@ -5,6 +5,8 @@ tcltest::test set-1.1 {set async} -constraints {
 } -body {
     set cmdId [$r SET key1 value1]
     $r result $cmdId
+} -cleanup {
+    $r destroy
 } -result OK
 
 tcltest::test set-1.2 {set sync} -constraints {
@@ -13,6 +15,8 @@ tcltest::test set-1.2 {set sync} -constraints {
     set r [retcl new]
 } -body {
     $r -sync SET key2 value2
+} -cleanup {
+    $r destroy
 } -result OK
 
 tcltest::test get-1.1 {get async} -constraints {
@@ -22,6 +26,8 @@ tcltest::test get-1.1 {get async} -constraints {
 } -body {
     set cmdId [$r GET key1]
     $r result $cmdId
+} -cleanup {
+    $r destroy
 } -result value1
 
 tcltest::test get-1.2 {get sync} -constraints {
@@ -30,4 +36,6 @@ tcltest::test get-1.2 {get sync} -constraints {
     set r [retcl new]
 } -body {
     $r -sync GET key2
+} -cleanup {
+    $r destroy
 } -result value2

@@ -1,5 +1,5 @@
 ##
-# Copyright (C) 2014-2016 Pietro Cerutti <gahr@gahr.ch>
+# Copyright (C) 2014-2017 Pietro Cerutti <gahr@gahr.ch>
 # 
 # Retcltribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,7 +23,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
-#/
+#
 
 package require Tcl 8.6
 package require TclOO
