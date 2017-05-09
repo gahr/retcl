@@ -10,13 +10,13 @@ Retcl (read *reticle*, not *ridicule*) is an event-driven, object-oriented,
 [Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file, which
 makes it extremely easy to deploy or integrate into existing projects. 
 
-* [retcl] (#retcl)
-* [Commands identifiers and retrieving results] (#commands)
-* [The results cache] (#cache)
-* [Commands pipelining] (#pipelining)
-* [Publish / Subscribe and callbacks] (#pubsub)
-* [Handling errors] (#errors)
-* [Reference] (#reference)
+* [retcl](#retcl)
+* [Commands identifiers and retrieving results](#commands)
+* [The results cache](#cache)
+* [Commands pipelining](#pipelining)
+* [Publish / Subscribe and callbacks](#pubsub)
+* [Handling errors](#errors)
+* [Reference](#reference)
 
 
 <a name="retcl"></a>
