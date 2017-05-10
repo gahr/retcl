@@ -98,6 +98,10 @@ oo::class create retcl {
     variable isPipelined
 
     ##
+    # Simple sentinel that's set whenever there's activity
+    variable activity
+
+    ##
     # Constructor -- connect to a Retcl server.
     constructor {{host 127.0.0.1} {port 6379}} {
         set typeNames {
@@ -250,7 +254,7 @@ oo::class create retcl {
                 return {}
             }
 
-            vwait [self namespace]::resultsCache
+            vwait [self namespace]::activity
 
             if {![my connected]} {
                 my Error {Disconnected}
@@ -407,6 +411,7 @@ oo::class create retcl {
     ##
     # Handle a read event from the socket.
     method readEvent {} {
+        set activity 1
         if {[chan eof $sock]} {
             my disconnect
             return
