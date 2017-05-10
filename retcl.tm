@@ -729,6 +729,9 @@ oo::class create retcl {
     ##
     # Flush the output buffer
     method Flush {} {
+        if {![my connected]} {
+            my Error {Disconnected}
+        }
         if {[catch {puts -nonewline $sock $pipeline} err]} {
             my Error $err
         }
