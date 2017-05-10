@@ -168,7 +168,6 @@ oo::class create retcl {
     method disconnect {} {
         catch {close $sock}
         set sock {}
-        set resultsCache [dict create]
     }
 
     ##
