@@ -16,6 +16,7 @@ extremely easy to deploy or integrate into existing projects.
 * [Commands pipelining](#pipelining)
 * [Publish / Subscribe and callbacks](#pubsub)
 * [Handling errors](#errors)
+* [Handling reconnections](#reconnect)
 * [Reference](#reference)
 
 
@@ -246,6 +247,33 @@ an error handler is setup to disconnect the client whenever an error occurs:
 
 The `errorHandler` method might be called without any additional arguments to
 restore the default error handler.
+
+
+<a name="reconnect"><a>
+### Handling reconnections
+
+When a command fails to send because of a lost connection, the pipeline is not
+flushed. This allows the client to reconnect and resume the pipeline by invoking
+any command (like `PING`). This is demonstrated in the following example:
+
+    % r SET a 1
+    rds:1
+    % r GET a
+    rds:2
+    % r QUIT ;# Simulate a disconnection
+    rds:3
+    % r SET a 2
+    Disconnected
+    while evaluating r set a 2
+    % r connect ;# Ok, we're back on track
+    % r PING
+    rds:5 ;# rds:4 has not been lost, it's tracking the result of the resumed "SET a 2"
+    % r GET a
+    rds:6
+    % r allResults
+    rds:1 OK rds:2 1 rds:3 OK rds:4 OK rds:5 PONG rds:6 2
+    % r result rds:6
+    2 ;# 'a' == 2, as would have been the case without disconnections
 
 
 <a name="reference"></a>
