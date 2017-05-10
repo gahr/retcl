@@ -106,6 +106,15 @@ returns a boolean indicating whether a response for the result is available:
     % r resultReady rds:1
     1
 
+The type of a result can also be queried with the `resultType` method. If a
+result is not ready, the method returns the empty string. Otherwise, it returns
+one of `SimpleString`, `Error`, `Integer`, `BulkString`, `Array`.
+
+    % r PING
+    rds:1
+    % r resultType rds:1
+    SimpleString
+
 The asynchronous operation mode can be turned off (and back on) using the pair
 of methods `-async` and `+async`. When the asynchronous mode is disabled,
 Redis commands are executed and their results returned as soon as they are
