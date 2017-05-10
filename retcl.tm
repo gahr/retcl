@@ -28,7 +28,7 @@
 package require Tcl 8.6
 package require TclOO
 
-package provide retcl 0.1.0
+package provide retcl 0.2.0
 
 catch {retcl destroy}
 
@@ -44,11 +44,12 @@ oo::class create retcl {
     # to the server is assigned a unique identifier, which can be then used by
     # the user to retrieve the result (see [result] method).  The resultsCache
     # variable is a dictionary where unique identifiers are the keys, with
-    # further keys for status, and response.  Status is either 0 (not replied)
-    # or 1 (replied). New commands are appended at the tail of the list;
-    # responses are inserted at the first command with a status 0.
+    # further keys for status, type, and response.  Status is either 0 (not
+    # replied) or 1 (replied). Type is one of the values of the typeNames list.
+    # New commands are appended at the tail of the list; responses are inserted
+    # at the first command with a status 0.
     #
-    # (cmd1 {status (0|1) response (RESPONSE)})
+    # (cmd1 {status (0|1) type (SimpleString|...) response (RESPONSE)})
     #
     variable resultsCache
 
@@ -265,6 +266,16 @@ oo::class create retcl {
             my Error "Invalid command id: $cmdId"
         }
         dict get $resultsCache $cmdId status
+    }
+
+    ##
+    # Retrieve the type of a result, or the empty string if the result is not
+    # ready.
+    method resultType {cmdId} {
+        if {[catch {dict get $resultsCache $cmdId type} res]} {
+            set res {}
+        }
+        set res
     }
 
     ##
@@ -578,6 +589,7 @@ oo::class create retcl {
             my Error "No request found for response $body"
         }
         set cmdId [lindex $cmdIds 0]
+        dict set resultsCache $cmdId type $type
         dict set resultsCache $cmdId response $body
         dict set resultsCache $cmdId status 1
     }
