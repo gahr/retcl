@@ -64,8 +64,8 @@ oo::class create retcl {
     variable keepCache
 
     ##
-    # Boolean to indicate whether commands are to be sent out in an asynchronous
-    # way (see +async and -async methods).
+    # Boolean to indicate whether commands are to be sent out in an
+    # asynchronous way (see +async and -async methods).
     variable async
 
     ##
@@ -142,7 +142,6 @@ oo::class create retcl {
         set port $a_port
 
         set sock [socket $host $port]
-        #chan configure $sock -blocking 0 -buffering line -encoding binary -translation binary
         chan configure $sock -blocking 0 -translation binary
         chan event $sock readable [list [self object] readEvent]
     }
@@ -164,7 +163,7 @@ oo::class create retcl {
     ##
     # Check whether we're currently connected to a Retcl server.
     method connected {} {
-        return [expr {$sock ne {}}]
+        expr {$sock ne {}}
     }
 
     ##
@@ -202,7 +201,6 @@ oo::class create retcl {
     }
     export -keepCache
 
-
     ##
     # Setup and error callback or restore the default one ([error]). The
     # cmdPrefix is passed an additional argument containing the error message.
@@ -216,8 +214,8 @@ oo::class create retcl {
 
     ##
     # Get the result of a previously issued command. If the response has not
-    # yet arrived, the command waits until it's available, or returns the
-    # empty string if -async is given.
+    # yet arrived, the command waits until it's available, or returns the empty
+    # string if -async is given.
     method result {args} {
 
         switch [llength $args] {
@@ -282,8 +280,7 @@ oo::class create retcl {
     }
 
     ##
-    # Return a dictionary of the reuslts in form
-    # of cmdId =>  result.
+    # Return a dictionary of the reuslts in form of cmdId => result.
     method allResults {} {
 
         set res [dict create]
@@ -304,12 +301,13 @@ oo::class create retcl {
     method clearResult {{clearCmdId {}}} {
 
         if {$clearCmdId eq {}} {
-            set resultsCache [dict filter $resultsCache script {cmdId cmdStatus} {
+            set resultsCache [dict filter $resultsCache script {cmdId _} {
                 expr {![dict get $resultsCache $cmdId status]}
             }]
         } else {
-            set resultsCache [dict filter $resultsCache script {cmdId cmdStatus} {
-                expr {$clearCmdId ne $cmdId || ![dict get $resultsCache $cmdId status]}
+            set resultsCache [dict filter $resultsCache script {cmdId _} {
+                expr {$clearCmdId ne $cmdId ||
+                      ![dict get $resultsCache $cmdId status]}
             }]
         }
         return {}
@@ -368,7 +366,8 @@ oo::class create retcl {
             set sendAsync 0
         }
 
-        if {[string tolower [lindex $args 0]] in {psubscribe punsubscribe subscribe unsubscribe}} {
+        set pubSubCmds [list psubscribe punsubscribe subscribe unsubscribe]
+        if {[string tolower [lindex $args 0]] in $pubSubCmds} {
             # These messages are part of the Pub/Sub protocol; we don't expect
             # a response.
             set cmdId {}
@@ -389,7 +388,6 @@ oo::class create retcl {
             return $res
         }
     }
-
 
     ##########################################################################
     # The following methods are private to the retcl library and not intended
@@ -546,7 +544,6 @@ oo::class create retcl {
         return [list $eol $line]
     }
 
-
     ##
     # Handle a complete result read from the server.
     method HandleResult {type body} { 
@@ -601,11 +598,10 @@ oo::class create retcl {
     ##
     # Get a return type string by its byte.
     method TypeName {byte} {
-        try {
-            return [dict get $typeNames $byte]
-        } on error message {
+        if {[catch {dict get $typeNames $byte} name]} {
             my Error "Invalid type byte: $byte"
         }
+        set name
     }
 
     ##
@@ -637,7 +633,7 @@ oo::class create retcl {
     # to recursively call [my Recv] to receive Array elements.
     method Recv {{includeTypes 1} {maxResults -1}} {
         if {$maxResults == 0} {
-            return {}
+            return
         }
 
         set result [list]
@@ -695,7 +691,7 @@ oo::class create retcl {
             }
         }
 
-        return $result
+        set result
     }
 
     ##
@@ -709,7 +705,7 @@ oo::class create retcl {
             }
         }
 
-        return $allPending
+        set allPending
     }
 
     ##
