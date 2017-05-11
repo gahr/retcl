@@ -1,0 +1,17 @@
+tcltest::test callback-1.1 {use callback to retrieve result} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    proc mycb {resVar args} {
+        upvar $resVar res
+        set res $args
+    }
+    set res {}
+    $r SET a 42
+    $r -cb [list mycb [namespace current]::res] GET a
+    vwait res
+    set res
+} -cleanup {
+    $r destroy
+} -result {rds:2 BulkString 42}

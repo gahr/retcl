@@ -44,12 +44,19 @@ oo::class create retcl {
     # to the server is assigned a unique identifier, which can be then used by
     # the user to retrieve the result (see [result] method).  The resultsCache
     # variable is a dictionary where unique identifiers are the keys, with
-    # further keys for status, type, and response.  Status is either 0 (not
+    # further keys for a possible callback, status, type, and response.  A
+    # callback is defined by the -cb cmdPrefix argument to any command and is
+    # invoked whenever a result is made available. Status is either 0 (not
     # replied) or 1 (replied). Type is one of the values of the typeNames list.
     # New commands are appended at the tail of the list; responses are inserted
-    # at the first command with a status 0.
+    # at the first command with a status 0. Example given:
     #
-    # (cmd1 {status (0|1) type (SimpleString|...) response (RESPONSE)})
+    # rds:1 {
+    #    status   (0|1)
+    #    callback (cmdPrefix)
+    #    type     (SimpleString|...)
+    #    response (RESPONSE)
+    # }
     #
     variable resultsCache
 
@@ -356,14 +363,23 @@ oo::class create retcl {
         }
 
         set sendAsync $async
+        set callback {}
 
-        if {[lindex $args 0] eq {-sync}} {
-            # Send synchronously and return the result, when available
-            set args [lrange $args 1 end]
-            if {![llength $args]} {
-                return
+        switch [lindex $args 0] {
+            {-sync} {
+                # Send synchronously and return the result, when available
+                set sendAsync 0
+                set args [lrange $args 1 end]
             }
-            set sendAsync 0
+            {-cb} {
+                # Be notified via a callback
+                set callback [lindex $args 1]
+                set args [lrange $args 2 end]
+            }
+        }
+
+        if {![llength $args]} {
+            return
         }
 
         set pubSubCmds [list psubscribe punsubscribe subscribe unsubscribe]
@@ -374,11 +390,12 @@ oo::class create retcl {
         } else {
             set cmdId "rds:[incr cmdIdNumber]"
             dict set resultsCache $cmdId status 0
+            dict set resultsCache $cmdId callback $callback
         }
 
         my Send $args
 
-        if {$sendAsync || $cmdId eq {}} {
+        if {$sendAsync || $callback ne {} || $cmdId eq {}} {
             # Asynchronous send, return the command identifier
             return $cmdId
         } else {
@@ -590,9 +607,15 @@ oo::class create retcl {
             my Error "No request found for response $body"
         }
         set cmdId [lindex $cmdIds 0]
-        dict set resultsCache $cmdId type $type
-        dict set resultsCache $cmdId response $body
-        dict set resultsCache $cmdId status 1
+        set cb [dict get $resultsCache $cmdId callback]
+        if {$cb ne {}} {
+            {*}$cb $cmdId $type $body
+            dict unset resultsCache $cmdId
+        } else {
+            dict set resultsCache $cmdId type $type
+            dict set resultsCache $cmdId response $body
+            dict set resultsCache $cmdId status 1
+        }
     }
 
     ##

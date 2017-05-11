@@ -116,6 +116,24 @@ one of `SimpleString`, `Error`, `Integer`, `BulkString`, `Array`.
     % r resultType rds:1
     SimpleString
 
+Another way to handle the result of a command is by using the `-cb cmdPrefix`
+switch. In this case, the result identifier is returned immediately as if the
+`-sync` switch was not specified and the `cmdPrefix` is arranged to be called
+when the result is available. The appended arguments are the **command
+identifier**, the result type, and the body.
+
+   % proc mycb {resVar args} {
+         upvar $resVar res
+         set res $args
+     }
+   % set res {}
+   % r SET a 42
+   rds:1
+   % r -cb [list mycb [namespace current]::res] GET a
+   % vwait res
+   % set res
+   rds:2 BulkString 42
+
 The asynchronous operation mode can be turned off (and back on) using the pair
 of methods `-async` and `+async`. When the asynchronous mode is disabled,
 Redis commands are executed and their results returned as soon as they are
