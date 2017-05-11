@@ -122,17 +122,17 @@ switch. In this case, the result identifier is returned immediately as if the
 when the result is available. The appended arguments are the **command
 identifier**, the result type, and the body.
 
-   % proc mycb {resVar args} {
-         upvar $resVar res
-         set res $args
-     }
-   % set res {}
-   % r SET a 42
-   rds:1
-   % r -cb [list mycb [namespace current]::res] GET a
-   % vwait res
-   % set res
-   rds:2 BulkString 42
+    % proc mycb {resVar args} {
+          upvar $resVar res
+          set res $args
+      }
+    % set res {}
+    % r SET a 42
+    rds:1
+    % r -cb [list mycb [namespace current]::res] GET a
+    % vwait res
+    % set res
+    rds:2 BulkString 42
 
 The asynchronous operation mode can be turned off (and back on) using the pair
 of methods `-async` and `+async`. When the asynchronous mode is disabled,
