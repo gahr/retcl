@@ -319,6 +319,16 @@ Retrieve the result of the command identified by the ***command identifier***
 `cmdId`. If the result is not yet available, either wait or return the empty
 string if `-async` was specified.
 
+    r resultReady cmdId
+
+Return a boolean indicating whether the result for `cmdId` is ready for
+retrieval.
+
+    r resultType cmdId
+
+Retrieve the type of the result `cmdId` or the empty string if `cmdId` is not
+ready for retrieval.
+
     r allResults
     
 Retrieve a dictionary where ***command identifiers*** are keys and
