@@ -15,7 +15,7 @@ tcltest::test resultReady-1.2 {resultReady after event loop} -constraints {
 } -body {
     set res [$r PING]
     set done 0
-    after 100 {
+    after 50 {
         set done 1
     }
     vwait done
