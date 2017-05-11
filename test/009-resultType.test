@@ -5,7 +5,7 @@ tcltest::test resultType-1.1 {set is simple string} -constraints {
 } -body {
     set res [$r set a 12]
     set done 0
-    after 100 {
+    after 50 {
         set done 1
     }
     vwait done
@@ -22,7 +22,7 @@ tcltest::test resultType-1.2 {set with two params is an error} -constraints {
 } -body {
     set res [$r set a 12 13]
     set done 0
-    after 100 {
+    after 50 {
         set done 1
     }
     vwait done
