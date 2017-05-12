@@ -331,8 +331,13 @@ oo::class create retcl {
     method pipeline {script} {
 
         my LockPipeline
-        uplevel [list eval $script]
-        my ReleasePipeline
+        try {
+            uplevel [list eval $script]
+        } on error msg {
+            error $msg
+        } finally {
+            my ReleasePipeline
+        }
     }
 
     ##

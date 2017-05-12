@@ -22,3 +22,19 @@ tcltest::test pipeline-1.1 {simple pipeline} -constraints {
 } -cleanup {
     $r destroy
 } -result {rds:1 OK rds:2 23 rds:3 OK rds:4 25 rds:5 OK rds:6 27}
+
+# https://github.com/gahr/retcl/issues/5
+tcltest::test pipeline-1.2 {pipeline not dismantled on error} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    set res {}
+    catch { $r pipeline { error failure! } } res
+    $r pipeline {
+        append res ok!
+    }
+    set res
+} -cleanup {
+    $r destroy
+} -result {failure!ok!}
