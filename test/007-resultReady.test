@@ -1,3 +1,5 @@
+tcltest::loadTestedCommands
+
 tcltest::test resultReady-1.1 {resultReady not yet} -constraints {
     serverIsRunning
 } -setup {
@@ -14,11 +16,7 @@ tcltest::test resultReady-1.2 {resultReady after event loop} -constraints {
     set r [retcl new]
 } -body {
     set res [$r PING]
-    set done 0
-    after 50 {
-        set done 1
-    }
-    vwait done
+    runEvents
     $r resultReady $res
 } -cleanup {
     $r destroy

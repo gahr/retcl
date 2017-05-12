@@ -1,14 +1,12 @@
+tcltest::loadTestedCommands
+
 tcltest::test resultType-1.1 {set is simple string} -constraints {
     serverIsRunning
 } -setup {
     set r [retcl new]
 } -body {
     set res [$r set a 12]
-    set done 0
-    after 50 {
-        set done 1
-    }
-    vwait done
+    runEvents
     $r resultType $res
 } -cleanup {
     $r del 12
@@ -21,11 +19,7 @@ tcltest::test resultType-1.2 {set with two params is an error} -constraints {
     set r [retcl new]
 } -body {
     set res [$r set a 12 13]
-    set done 0
-    after 50 {
-        set done 1
-    }
-    vwait done
+    runEvents
     $r resultType $res
 } -cleanup {
     $r del 12
