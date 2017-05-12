@@ -4,7 +4,14 @@ package require tcltest 2.3
 tcl::tm::path add [file join [file dirname [info script]] .. ]
 package require retcl
 
-tcltest::configure {*}$argv -singleproc 1 -testdir [file dir [info script]]
+tcltest::configure {*}$argv -singleproc 1 -testdir [file dir [info script]] \
+    -load {
+        proc runEvents {} {
+            set done 0
+            after 50 { set done 1 }
+            vwait done
+        }
+    }
 
 # Check that the server is up and running
 if {[catch {socket localhost 6379} fd]} {

@@ -1,0 +1,24 @@
+tcltest::loadTestedCommands
+
+tcltest::test pipeline-1.1 {simple pipeline} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    proc cb {varName args} {
+        set $varName 1
+    }
+    set done 0
+    $r pipeline {
+        $r set a 23
+        $r get a
+        $r set a 25
+        $r get a
+        $r set a 27
+        $r get a
+    }
+    runEvents
+    $r allResults
+} -cleanup {
+    $r destroy
+} -result {rds:1 OK rds:2 23 rds:3 OK rds:4 25 rds:5 OK rds:6 27}
