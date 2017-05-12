@@ -1,5 +1,5 @@
 [comment {-*- tcl -*- doctools manpage}]
-[manpage_begin retcl n 0.2.1]
+[manpage_begin retcl n 0.2.2]
 [moddesc {Redis client}]
 [titledesc {Tcl client library for Redis}]
 [require Tcl 8.6]
