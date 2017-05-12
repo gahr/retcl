@@ -1,0 +1,147 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin retcl n 0.2.1]
+[moddesc {Redis client}]
+[titledesc {Tcl client library for Redis}]
+[require Tcl 8.6]
+[require TclOO 1.0]
+
+[copyright {2014-2017 Pietro Cerutti <gahr@gahr.ch>}]
+
+[description]
+The [package retcl] module is an event-driven, object-oriented, Redis client
+library, which API exposes a single [package retcl] class. Objects of this
+class represent connections to a Redis server and are used to send requests as
+commands and retrieve responses.
+
+[para]
+
+Other than a few book-keeping methods, instance objects of the [package retcl]
+class transparently handle Redis commands as first-class methods. As an
+example, [example {r SET K Hello}] can be used to set the value of the key
+[emph K] to the string [emph Hello]. This is achieved by proxying all unknown
+methods to the Redis server by concatenating all arguments, effectively making
+the [package retcl] package completely decoupled from any version of Redis.
+This has several advantages:
+
+[list_begin item]
+[item] The [package retcl] package does not need to know about the semantics of
+a particular Redis command. This includes syntax checks, context verification
+and arguments validation, which are offloaded to the Redis server. As a
+consequence, the code base remains clean and small.
+[item] New commands introduced by a server upgrade are immediately available to
+a live application.
+[list_end]
+
+[section COMMANDS]
+
+[list_begin definitions]
+
+[call [cmd {retcl create}] [arg r] [opt hostname] [opt port]]
+
+This command creates a new [package retcl] object and automatically connects to
+the Redis server at [arg hostname]:[arg port]. The [arg hostname] argument
+defaults to 127.0.0.1. The [arg port] argument defaults to 6379.
+
+[call [emph r] [cmd connected]]
+
+Returns wheter the socket with the Redis server is open.
+
+[call [emph r] [cmd connect] [opt hostname] [opt port]]
+
+Connect to the Redis server at [arg hostname]:[arg port], which defaults to
+127.0.0.1:6379. It is an error to attempt a connection using an already
+connected object.
+
+[call [emph r] [cmd disconnect]]
+
+Disconnect from the Redis server.
+
+[call [emph r] [opt -sync] [opt {-cb cmdPrefix}] [cmd REDIS_CMD] [opt {arg ...}]]
+
+Methods not explicitely defined by the [package retcl] class are forwarded to
+Redis by concatenating the [cmd REDIS_CMD] and any optional arguments.
+By default, commands are sent in asynchronous mode and immediately return a
+[emph cmdId] identifier that can be later used to retrieve the result. The
+default mode can be changed with the [cmd +async] and [cmd -async] commands.
+if [arg -sync] is specified, the command is sent synchronously and will wait
+until a response is available. The body of the response is returned.
+If [arg {-cb cmdPrefix}] is specified, the command is sent asynchronously and
+return a [emph cmdId] immediately. [emph cmdPrefix] will eventually be called
+when the response is available, with the [emph {cmdId}], type and body of the
+result as additional parameters.
+Either [arg -sync] or [arg {-cb cmdPrefix}] might be specified, but not both.
+
+[call [emph r] [cmd result] [opt -async] [arg cmdId]]
+
+Returns the result of the command identified by [arg cmdId]. If the response is
+not yet available and [arg -async] is specified, the command returns the empty
+string, otherwise it will wait.
+
+[call [emph r] [cmd resultReady] [arg cmdId]]
+
+Returns a boolean indicating whether the response for the command identified by
+[arg cmdId] is ready for retrieval.
+
+[call [emph r] [cmd resultType] [arg cmdId]]
+u
+Returns the type of the result of the command identified by [arg cmdId]. If the
+response is not ready for retrieval, this command returns the empty string.
+
+[call [emph r] [cmd allResults]]
+
+Returns a dictionary of all available results. Results are kept in a
+[emph {results cache}] for later retrieval. Each key in the dictionary is a
+[emph cmdId] and each value is its associated response body.
+
+[call [emph r] [cmd +keepCache]]
+
+Turn on the use of the [emph {results cache}]. This is the default.
+
+[call [emph r] [cmd -keepCache]]
+
+Turn off the use of the [emph {results cache}]. Results are removed from the
+cache as soon as they are retrieved.
+
+[call [emph r] [cmd clearResult] [opt cmdId]]
+
+Remove the result for [opt cmdId] from the [emph {results cache}] or clear it
+entirely.
+
+[call [emph r] [cmd +async]]
+
+Turn on asynchronous operation. In this mode, commands return immediately with
+a [emph {command identifier}].
+
+[call [emph r] [cmd -async]]
+
+Turn off asynchronous operation. In this mode, commands wait until a response
+is received and return the body.
+
+[call [emph r] [cmd pipeline] [arg script]]
+
+Pipelining allows to queue several commands and send them out in a single batch
+to the Redis server. This is more efficient than sending each command
+independently. The [arg script] is evaluated at caller's scope and it might
+contain any valid Tcl commands. Any Redis commands sent during the evaluation
+of the [arg script] are queued and sent to the Redis server at the end of the
+script. This command returns the empty string. Results can be obtained using
+the [cmd allResults] method.
+
+[call [emph r] [cmd callback] [arg item] [opt cmdPrefix]]
+
+Callbacks are part of the Redis Pub/Sub mechanism. A client registers a
+callback on a subscription item, and then subscribes to that channel using the
+[emph PSUBSCRIBE] Redis command. When a message arrives on the subscription
+item, [arg cmdPrefix] is called appending the following to the arguments list:a
+
+    [list_begin item]
+    [item] [emph type] The type of the message (subscribe, unsubscribe, or
+    message).
+    [item] [emph pattern] The subscription item as specified in the [emph \
+    PSUBSCRIBE] command.
+    [item] [emph channel] The actual channel the message was sent to.
+    [item] [emph message] The message received.
+    [list_end]
+[list_end]
+
+[manpage_end]
