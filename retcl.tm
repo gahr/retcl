@@ -148,7 +148,9 @@ oo::class create retcl {
         set host $a_host
         set port $a_port
 
-        set sock [socket $host $port]
+        if {[catch {socket $host $port} sock]} {
+            my Error "Cannot connect: $sock"
+        }
         chan configure $sock -blocking 0 -translation binary
         chan event $sock readable [list [self object] readEvent]
     }
@@ -161,7 +163,11 @@ oo::class create retcl {
         if {$i == 10} {
             my Error {Could not reconnect to Redis server}
         }
-        if {[catch {my connect $host $port} err]} {
+        set saveErrorCallback $errorCallback
+        my errorHandler {}
+        set err [catch {my connect $host $port} err]
+        my errorHandler $saveErrorCallback
+        if {$err} {
             after 3000 [list [self object] reconnect [incr i]]
             return
         }
