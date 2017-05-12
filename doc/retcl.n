@@ -286,6 +286,8 @@ package require \fBTclOO  1\&.0\fR
 .sp
 \fIr\fR \fBdisconnect\fR
 .sp
+\fIr\fR \fBreconnect\fR
+.sp
 \fIr\fR ?-sync? ?-cb cmdPrefix? \fBREDIS_CMD\fR ?arg \&.\&.\&.?
 .sp
 \fIr\fR \fBresult\fR ?-async? \fIcmdId\fR
@@ -305,6 +307,8 @@ package require \fBTclOO  1\&.0\fR
 \fIr\fR \fB+async\fR
 .sp
 \fIr\fR \fB-async\fR
+.sp
+\fIr\fR \fBerrorHandler\fR ?cmdPrefix?
 .sp
 \fIr\fR \fBpipeline\fR \fIscript\fR
 .sp
@@ -341,12 +345,34 @@ a live application\&.
 .SH COMMANDS
 .TP
 \fBretcl create\fR \fIr\fR ?hostname? ?port?
-This command creates a new \fBretcl\fR object and automatically connects to
-the Redis server at \fIhostname\fR:\fIport\fR\&. The \fIhostname\fR argument
-defaults to 127\&.0\&.0\&.1\&. The \fIport\fR argument defaults to 6379\&.
+Create a new \fBretcl\fR object and automatically connects to the Redis
+server at \fIhostname\fR:\fIport\fR\&. The \fIhostname\fR argument defaults to
+127\&.0\&.0\&.1\&. The \fIport\fR argument defaults to 6379\&.
+.sp
+Example: create a Redis client object named \fIr\fR and connect to the Redis
+server on 192\&.168\&.1\&.3, default port 6379:
+.CS
+
+
+    % retcl create r 192\&.168\&.1\&.3
+    ::r
+
+.CE
 .TP
 \fIr\fR \fBconnected\fR
-Returns wheter the socket with the Redis server is open\&.
+Check whether the socket with the Redis server is open\&. Return 1 if it is, 0
+otherwise\&.
+Example: check the connection status, disconnect, check again:
+.CS
+
+
+    % r connected
+    1
+    % r disconnect
+    % r connected
+    0
+
+.CE
 .TP
 \fIr\fR \fBconnect\fR ?hostname? ?port?
 Connect to the Redis server at \fIhostname\fR:\fIport\fR, which defaults to
@@ -355,6 +381,12 @@ connected object\&.
 .TP
 \fIr\fR \fBdisconnect\fR
 Disconnect from the Redis server\&.
+.TP
+\fIr\fR \fBreconnect\fR
+Try to reconnect to the server that was specified upon construction\&. This
+method returns immediately and schedules to retry for 30 seconds\&. If no
+connection can be established after this time, an error is reported using the
+\fIerror handler\fR\&.
 .TP
 \fIr\fR ?-sync? ?-cb cmdPrefix? \fBREDIS_CMD\fR ?arg \&.\&.\&.?
 Methods not explicitely defined by the \fBretcl\fR class are forwarded to
@@ -371,23 +403,20 @@ result as additional parameters\&.
 Either \fI-sync\fR or \fI-cb cmdPrefix\fR might be specified, but not both\&.
 .TP
 \fIr\fR \fBresult\fR ?-async? \fIcmdId\fR
-Returns the result of the command identified by \fIcmdId\fR\&. If the response is
+Return the result of the command identified by \fIcmdId\fR\&. If the response is
 not yet available and \fI-async\fR is specified, the command returns the empty
 string, otherwise it will wait\&.
 .TP
 \fIr\fR \fBresultReady\fR \fIcmdId\fR
-Returns a boolean indicating whether the response for the command identified by
+Return a boolean indicating whether the response for the command identified by
 \fIcmdId\fR is ready for retrieval\&.
 .TP
 \fIr\fR \fBresultType\fR \fIcmdId\fR
-u
-Returns the type of the result of the command identified by \fIcmdId\fR\&. If the
+Return the type of the result of the command identified by \fIcmdId\fR\&. If the
 response is not ready for retrieval, this command returns the empty string\&.
 .TP
 \fIr\fR \fBallResults\fR
-Returns a dictionary of all available results\&. Results are kept in a
-\fIresults cache\fR for later retrieval\&. Each key in the dictionary is a
-\fIcmdId\fR and each value is its associated response body\&.
+Return a dictionary of all available results\&. Results are kept in a \fIresults cache\fR for later retrieval\&. Each key in the dictionary is a \fIcmdId\fR and each value is its associated response body\&.
 .TP
 \fIr\fR \fB+keepCache\fR
 Turn on the use of the \fIresults cache\fR\&. This is the default\&.
@@ -407,6 +436,13 @@ a \fIcommand identifier\fR\&.
 \fIr\fR \fB-async\fR
 Turn off asynchronous operation\&. In this mode, commands wait until a response
 is received and return the body\&.
+.TP
+\fIr\fR \fBerrorHandler\fR ?cmdPrefix?
+Set up an \fIerror handler\fR to be called whenever an asynchronous error
+occurs inside the \fBretcl\fR package\&. The \fIcmdPrefix\fR is appended an
+error message\&. If \fIcmdPrefix\fR is the empty string, the \fIerror
+handler\fR is restored to the default \fBerror\fR command\&. This command returns
+the old \fIcmdPrefix\fR\&.
 .TP
 \fIr\fR \fBpipeline\fR \fIscript\fR
 Pipelining allows to queue several commands and send them out in a single batch
