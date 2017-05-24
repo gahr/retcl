@@ -105,6 +105,11 @@ oo::class create retcl {
     variable isPipelined
 
     ##
+    # After Id for the period event that checks whether the connection is still
+    # valid.
+    variable checkEventId
+
+    ##
     # Simple sentinel that's set whenever there's activity
     variable activity
 
@@ -153,6 +158,8 @@ oo::class create retcl {
         }
         chan configure $sock -blocking 0 -translation binary
         chan event $sock readable [list [self object] readEvent]
+        set checkEventId [after 500 [list [self object] checkConnection]]
+        return {}
     }
 
     ##
@@ -174,6 +181,17 @@ oo::class create retcl {
     }
 
     ##
+    # Periodically check whether a connection has been interrupted.
+    method checkConnection {} {
+        if {$sock ne {} && ![catch {chan eof $sock} err] && !$err} {
+            after 500 [list [self object] checkConnection]
+        } else {
+            my disconnect
+            set activity 1
+        }
+    }
+
+    ##
     # Check whether we're currently connected to a Retcl server.
     method connected {} {
         expr {$sock ne {}}
@@ -184,6 +202,7 @@ oo::class create retcl {
     method disconnect {} {
         catch {close $sock}
         set sock {}
+        after cancel $checkEventId
     }
 
     ##

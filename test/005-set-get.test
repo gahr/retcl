@@ -39,3 +39,32 @@ tcltest::test get-1.2 {get sync} -constraints {
 } -cleanup {
     $r destroy
 } -result value2
+
+tcltest::test get-1.3 {get disconnect before} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r disconnect
+    $r -sync GET key2
+} -cleanup {
+    $r destroy
+} -returnCodes {
+    1
+} -result Disconnected
+
+tcltest::test get-1.4 {get disconnect after} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    $r client pause 50
+    after 10 {
+        close [set [info object namespace $r]::sock]
+    }
+    $r -sync GET key2
+} -cleanup {
+    $r destroy
+} -returnCodes {
+    1
+} -result Disconnected
