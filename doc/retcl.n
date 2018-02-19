@@ -421,7 +421,21 @@ Return the type of the result of the command identified by \fIcmdId\fR\&. If the
 response is not ready for retrieval, this command returns the empty string\&.
 .TP
 \fIr\fR \fBallResults\fR
-Return a dictionary of all available results\&. Results are kept in a \fIresults cache\fR for later retrieval\&. Each key in the dictionary is a \fIcmdId\fR and each value is its associated response body\&.
+Return a dictionary of all available results\&. Results are kept in a \fIresults cache\fR for later retrieval\&. The dictionary containes two types of
+entries that provide information about the result values and their types\&.
+Values are associated with keys in the form \fIcmdId\fR, while types are
+associated with keys in the form \fIcmdId:type\fR\&.
+.CS
+
+
+    % r incr foo
+    rds:1
+    % r incr foo
+    rds:2
+    % r allResults
+    rds:1 1 rds:1:type Integer rds:2 2 rds:2:type Integer
+
+.CE
 .TP
 \fIr\fR \fB+keepCache\fR
 Turn on the use of the \fIresults cache\fR\&. This is the default\&.

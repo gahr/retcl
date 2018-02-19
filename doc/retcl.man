@@ -122,8 +122,20 @@ response is not ready for retrieval, this command returns the empty string.
 [call [emph r] [cmd allResults]]
 
 Return a dictionary of all available results. Results are kept in a [emph \
-{results cache}] for later retrieval. Each key in the dictionary is a [emph \
-cmdId] and each value is its associated response body.
+{results cache}] for later retrieval. The dictionary containes two types of
+entries that provide information about the result values and their types.
+Values are associated with keys in the form [emph cmdId], while types are
+associated with keys in the form [emph cmdId:type].
+
+
+[example {
+    % r incr foo
+    rds:1
+    % r incr foo
+    rds:2
+    % r allResults
+    rds:1 1 rds:1:type Integer rds:2 2 rds:2:type Integer
+}]
 
 [call [emph r] [cmd +keepCache]]
 

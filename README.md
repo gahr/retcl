@@ -143,7 +143,10 @@ available.
     Some value
 
 The `allResults` method allows to inspect the results cache by returning a
-dictionary of all available results where keys are **command identifiers** and
+dictionary of all available results. The dictionary containes two types of
+entries that provide information about the result values and their types.
+Values are associated with keys in the form **command identifier**, while
+types are associated with keys in the form **command identifier**:type.
 values are **results**:
 
     % r SET key val
@@ -151,7 +154,7 @@ values are **results**:
     % r GET key
     rds:2
     % r allResults
-    rds:1 OK rds:2 val
+    rds:1 OK rds1:type SimpleString rds:2 val rds:2:type SimpleString
 
 
 <a name="cache"></a>
