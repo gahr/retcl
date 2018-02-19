@@ -334,6 +334,7 @@ oo::class create retcl {
             dict with state {
                 if {$status == 1} {
                     dict set res $cmdId $response
+                    dict set res $cmdId:type $type
                 }
             }
         }

@@ -21,7 +21,7 @@ tcltest::test pipeline-1.1 {simple pipeline} -constraints {
     $r allResults
 } -cleanup {
     $r destroy
-} -result {rds:1 OK rds:2 23 rds:3 OK rds:4 25 rds:5 OK rds:6 27}
+} -result {rds:1 OK rds:1:type SimpleString rds:2 23 rds:2:type BulkString rds:3 OK rds:3:type SimpleString rds:4 25 rds:4:type BulkString rds:5 OK rds:5:type SimpleString rds:6 27 rds:6:type BulkString}
 
 # https://github.com/gahr/retcl/issues/5
 tcltest::test pipeline-1.2 {pipeline not dismantled on error} -constraints {
