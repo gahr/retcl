@@ -30,3 +30,22 @@ tcltest::test connect-1.3 {connected says 1} -constraints {
 } -cleanup {
     $r destroy
 } -result {1}
+
+tcltest::test connect-1.4 {connect from disconnected} -constraints {
+    serverIsRunning
+} -body {
+    set r [retcl new -noconnect]
+    $r connect
+    $r connected
+} -cleanup {
+    $r destroy
+} -result 1
+
+tcltest::test connect-1.5 {reconnect from disconnected} -constraints {
+} -body {
+    set r [retcl new -noconnect]
+    $r reconnect
+    $r connected
+} -cleanup {
+    $r destroy
+} -result 1

@@ -15,3 +15,12 @@ tcltest::test construct-1.2 {retcl new} -constraints {
 } -cleanup {
     $r destroy
 } -result ::retcl
+
+tcltest::test construct-1.3 {noconnect} -constraints {
+    serverIsRunning
+} -body {
+    set r [retcl new -noconnect]
+    $r connected
+} -cleanup {
+    $r destroy
+} -result 0

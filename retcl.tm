@@ -115,7 +115,7 @@ oo::class create retcl {
 
     ##
     # Constructor -- connect to a Retcl server.
-    constructor {{host 127.0.0.1} {port 6379}} {
+    constructor {{a_host 127.0.0.1} {a_port 6379}} {
         set typeNames {
             +   SimpleString
             -   Error
@@ -130,11 +130,14 @@ oo::class create retcl {
         set callbacks [dict create]
         set pipeline {}
         set isPipelined 0
+        set checkEventId {}
 
         my +keepCache
         my +async
         my errorHandler
-        my connect $host $port
+        if {$a_host ne {-noconnect}} {
+            my connect $a_host $a_port
+        }
     }
 
     ##
@@ -150,12 +153,13 @@ oo::class create retcl {
             my Error "Already connected"
         }
 
+        if {[catch {socket $a_host $a_port} res]} {
+            my Error "Cannot connect: $res"
+        }
+
+        set sock $res
         set host $a_host
         set port $a_port
-
-        if {[catch {socket $host $port} sock]} {
-            my Error "Cannot connect: $sock"
-        }
         chan configure $sock -blocking 0 -translation binary
         chan event $sock readable [list [self object] readEvent]
         set checkEventId [after 500 [list [self object] checkConnection]]
@@ -163,20 +167,27 @@ oo::class create retcl {
     }
 
     ##
-    # Reconnect to the Redis server. This tries to reconnect waiting up to 30
+    # Reconnect to the Redis server. This tries to reconnect waiting up to 10
     # seconds in total.
     method reconnect {{i 0}} {
         my disconnect
-        if {$i == 10} {
+        set maxAttempts 20
+        set waitMillis 500
+        if {$i == $maxAttempts} {
             my Error {Could not reconnect to Redis server}
         }
         set saveErrorCallback $errorCallback
         my errorHandler {}
-        set err [catch {my connect $host $port} err]
+        if {[info exists host] && [info exists port]} {
+            set connect_cmd [list connect $host $port]
+        } else {
+            set connect_cmd [list connect]
+        }
+        set err [catch {my {*}$connect_cmd} msg]
         my errorHandler $saveErrorCallback
         if {$err} {
-            after 3000 [list [self object] reconnect [incr i]]
-            return
+            after $waitMillis
+            my reconnect [incr i]
         }
     }
 
@@ -202,7 +213,9 @@ oo::class create retcl {
     method disconnect {} {
         catch {close $sock}
         set sock {}
-        after cancel $checkEventId
+        if {$checkEventId ne {}} {
+            after cancel $checkEventId
+        }
     }
 
     ##
@@ -455,6 +468,9 @@ oo::class create retcl {
 
     ##
     # Handle a read event from the socket.
+    #
+    # Must be public (starts with a lower case letter) because it's used in the
+    # event loop.
     method readEvent {} {
         set activity 1
         if {[chan eof $sock]} {
@@ -800,6 +816,12 @@ oo::class create retcl {
     method Error {msg} {
         {*}$errorCallback $msg
         return -level 2
+    }
+
+    ##
+    # Private part of the connection phase, using the `host' and `port'
+    # instance variables.
+    method DoConnect {} {
     }
 }
 

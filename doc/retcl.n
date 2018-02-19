@@ -280,6 +280,8 @@ package require \fBTclOO  1\&.0\fR
 .sp
 \fBretcl create\fR \fIr\fR ?hostname? ?port?
 .sp
+\fBretcl create\fR \fIr\fR -noconnect
+.sp
 \fIr\fR \fBconnected\fR
 .sp
 \fIr\fR \fBconnect\fR ?hostname? ?port?
@@ -359,6 +361,10 @@ server on 192\&.168\&.1\&.3, default port 6379:
 
 .CE
 .TP
+\fBretcl create\fR \fIr\fR -noconnect
+Create a new \fBretcl\fR object in disconnected mode\&. The object can be
+connected further on using the \fBconnect\fR or \fBreconnect\fR\&.
+.TP
 \fIr\fR \fBconnected\fR
 Check whether the socket with the Redis server is open\&. Return 1 if it is, 0
 otherwise\&.
@@ -383,10 +389,9 @@ connected object\&.
 Disconnect from the Redis server\&.
 .TP
 \fIr\fR \fBreconnect\fR
-Try to reconnect to the server that was specified upon construction\&. This
-method returns immediately and schedules to retry for 30 seconds\&. If no
-connection can be established after this time, an error is reported using the
-\fIerror handler\fR\&.
+Try to reconnect to the server that was specified upon construction for up to
+10 seconds\&. If no connection can be established after this time, an error is
+reported using the \fIerror handler\fR\&.
 .TP
 \fIr\fR ?-sync? ?-cb cmdPrefix? \fBREDIS_CMD\fR ?arg \&.\&.\&.?
 Methods not explicitely defined by the \fBretcl\fR class are forwarded to

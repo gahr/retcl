@@ -52,6 +52,11 @@ server on 192.168.1.3, default port 6379:
     ::r
 }]
 
+[call [cmd {retcl create}] [arg r] -noconnect]
+
+Create a new [package retcl] object in disconnected mode. The object can be
+connected further on using the [cmd connect] or [cmd reconnect].
+
 [call [emph r] [cmd connected]]
 
 Check whether the socket with the Redis server is open. Return 1 if it is, 0
@@ -79,10 +84,9 @@ Disconnect from the Redis server.
 
 [call [emph r] [cmd reconnect]]
 
-Try to reconnect to the server that was specified upon construction. This
-method returns immediately and schedules to retry for 30 seconds. If no
-connection can be established after this time, an error is reported using the
-[emph {error handler}].
+Try to reconnect to the server that was specified upon construction for up to
+10 seconds. If no connection can be established after this time, an error is
+reported using the [emph {error handler}].
 
 [call [emph r] [opt -sync] [opt {-cb cmdPrefix}] [cmd REDIS_CMD] [opt {arg ...}]]
 

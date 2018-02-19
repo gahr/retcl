@@ -44,7 +44,6 @@ The lifetime of the `r` command must be managed by the caller. The object must
 be explicitely destroyed via a call to `r destroy` (or `$red destroy`) to avoid
 resource leaks.
 
-
 <a name="commands"></a>
 ### Command identifiers and retrieving results
 
@@ -293,6 +292,18 @@ any command (like `PING`). This is demonstrated in the following example:
     % r result rds:6
     2 ;# 'a' == 2, as would have been the case without disconnections
 
+It is also possible to manage the connection to the Redis server manually,
+possibly constructing the retcl object in disconnected mode and using the
+`connect`, `disconnect` and `reconnect` methods. The latter tries to reconnect
+to the server for as much as 10 seconds before giving up.
+
+    % retcl create r -noconnect
+    ::r
+    % r connected
+    0
+    % r connect
+    % r disconnect
+    % r reconnect
 
 <a name="reference"></a>
 ### Reference
@@ -301,6 +312,10 @@ any command (like `PING`). This is demonstrated in the following example:
 or
   
     set r [retcl new ?host? ?port?]
+
+or
+
+    set r [rectl new -noconnect]
 
 Create a retcl object. 
 
@@ -311,13 +326,17 @@ The rest of the Reference assumes that an `r` command exists, as created by
     
 Disconnect from the server.
 
-    r connect host port
+    r connect ?host? ?port?
     
 Connect to the server `host` on port `port`.
 
     r connected
     
 Returns 1 if the client is connected, 0 otherwise.
+
+    r reconnect
+
+Try to reconnect for 10 seconds before giving up.
 
     r errorHandler ?cmdPrefix?
 
