@@ -46,6 +46,7 @@ tcltest::test connect-1.4 {connect from disconnected} -constraints {
 } -result 1
 
 tcltest::test connect-1.5 {reconnect from disconnected} -constraints {
+    serverIsRunning
 } -body {
     set r [retcl new -noconnect]
     $r reconnect
