@@ -110,6 +110,10 @@ oo::class create retcl {
     variable checkEventId
 
     ##
+    # After Id for the automatic reconnection.
+    variable reconnectEventId
+
+    ##
     # Simple sentinel that's set whenever there's activity
     variable activity
 
@@ -131,6 +135,7 @@ oo::class create retcl {
         set pipeline {}
         set isPipelined 0
         set checkEventId {}
+        set reconnectEventId {}
 
         my +keepCache
         my +async
@@ -186,8 +191,8 @@ oo::class create retcl {
         set err [catch {my {*}$connect_cmd} msg]
         my errorHandler $saveErrorCallback
         if {$err} {
-            after $waitMillis
-            my reconnect [incr i]
+            set reconnectEventId \
+                [after $waitMillis [list [self object] reconnect [incr i]]]
         }
     }
 
@@ -213,9 +218,8 @@ oo::class create retcl {
     method disconnect {} {
         catch {close $sock}
         set sock {}
-        if {$checkEventId ne {}} {
-            after cancel $checkEventId
-        }
+        after cancel $checkEventId
+        after cancel $reconnectEventId
     }
 
     ##

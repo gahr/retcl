@@ -84,9 +84,9 @@ Disconnect from the Redis server.
 
 [call [emph r] [cmd reconnect]]
 
-Try to reconnect to the server that was specified upon construction for up to
-10 seconds. If no connection can be established after this time, an error is
-reported using the [emph {error handler}].
+Return immediately, then try to reconnect to the server that was specified upon
+construction for up to 10 seconds. If no connection can be established after
+this time, an error is reported using the [emph {error handler}].
 
 [call [emph r] [opt -sync] [opt {-cb cmdPrefix}] [cmd REDIS_CMD] [opt {arg ...}]]
 

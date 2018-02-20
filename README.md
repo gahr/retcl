@@ -297,8 +297,9 @@ any command (like `PING`). This is demonstrated in the following example:
 
 It is also possible to manage the connection to the Redis server manually,
 possibly constructing the retcl object in disconnected mode and using the
-`connect`, `disconnect` and `reconnect` methods. The latter tries to reconnect
-to the server for as much as 10 seconds before giving up.
+`connect`, `disconnect` and `reconnect` methods. The latter returns
+immediately, tries to reconnect to the server for as much as 10 seconds, and
+calls the error handler on failure.
 
     % retcl create r -noconnect
     ::r
@@ -339,7 +340,7 @@ Returns 1 if the client is connected, 0 otherwise.
 
     r reconnect
 
-Try to reconnect for 10 seconds before giving up.
+Returns immediately, try to reconnect for 10 seconds before giving up.
 
     r errorHandler ?cmdPrefix?
 
