@@ -58,14 +58,16 @@ tcltest::test connect-1.5 {reconnect from disconnected} -constraints {
 tcltest::test connect-1.6 {reconnect failure} -constraints {
     serverIsRunning
 } -body {
-    set ::result [list]
+    set result [list]
     set r [retcl new]
-    lappend ::result [$r connected]
+    lappend result [$r connected]
     stopServer
-    $r errorHandler [list apply {{msg} { lappend ::result $msg }}]
+    $r errorHandler [list apply {{ns msg} {
+            lappend ${ns}::result $msg
+        }} [namespace current]]
     $r reconnect
-    vwait ::result
-    lappend ::result [$r connected]
+    vwait result
+    lappend result [$r connected]
 } -cleanup {
     startServer
     $r destroy
@@ -74,16 +76,26 @@ tcltest::test connect-1.6 {reconnect failure} -constraints {
 tcltest::test connect-1.7 {reconnect success} -constraints {
     serverIsRunning
 } -body {
-    set ::result [list]
+    set result [list]
     set r [retcl new]
-    lappend ::result [$r connected]
+    lappend result [$r connected]
     stopServer
-    $r errorHandler [list apply {{msg} { lappend ::result $msg }}]
+    $r errorHandler [list apply {{ns msg} {
+            lappend ${ns}::result $msg
+        }} [namespace current]]
     $r reconnect
-    after 3000 { startServer }
-    after 12000 { lappend ::result {no timeout} }
-    vwait ::result
-    lappend ::result [$r connected]
+    after 1500 { startServer }
+    set check [list apply {{ns r} {
+            if {[$r connected]} {
+                lappend ${ns}::result reconnected
+            } else {
+                namespace upvar $ns check check
+                after 100 $check
+            }
+        }} [namespace current] $r]
+    after 100 $check
+    vwait result
+    lappend result [$r connected]
 } -cleanup {
     $r destroy
-} -result {1 {no timeout} 1}
+} -result {1 reconnected 1}
