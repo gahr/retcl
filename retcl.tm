@@ -367,7 +367,7 @@ oo::class create retcl {
         try {
             uplevel [list eval $script]
         } on error msg {
-            error $msg
+            my Error $msg
         } finally {
             my ReleasePipeline
         }
