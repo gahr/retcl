@@ -1,0 +1,24 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
+tcltest::loadTestedCommands
+
+proc make15mb {} {
+    expr {15 * 1024 * 1024}
+}
+
+tcltest::test bigchunk-1.1 {read / write a big chunk of data} -constraints {
+    serverIsRunning
+} -setup {
+    set fd [open /dev/random r]
+    chan configure $fd -translation binary
+    set data [read $fd [make15mb]]
+    close $fd
+    set r [retcl new]
+} -body {
+    $r -async
+    $r SET random $data
+    set random [$r GET random]
+    list [string length $data] [string length $random] [string compare $data $random]
+} -cleanup {
+    $r destroy
+} -result [list [make15mb] [make15mb] 0]
