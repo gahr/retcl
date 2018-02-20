@@ -1,3 +1,5 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
 tcltest::test pkg-version-1.1 {pkg version is correct} -body {
     package require retcl
 } -result {0.3.0}

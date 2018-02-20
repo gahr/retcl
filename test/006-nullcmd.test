@@ -1,3 +1,5 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
 tcltest::test nullcmd-1.1 {nullcmd} -constraints {
     serverIsRunning
 } -setup {

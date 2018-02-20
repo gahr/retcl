@@ -1,3 +1,5 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
 tcltest::loadTestedCommands
 
 tcltest::test resultReady-1.1 {resultReady not yet} -constraints {

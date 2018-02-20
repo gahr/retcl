@@ -1,3 +1,7 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
+tcltest::loadTestedCommands
+
 tcltest::test connect-1.1 {connect when already connected} -constraints {
     serverIsRunning
 } -setup {
