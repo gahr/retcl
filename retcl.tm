@@ -195,7 +195,7 @@ oo::class create retcl {
     # Periodically check whether a connection has been interrupted.
     method checkConnection {} {
         if {$sock ne {} && ![catch {chan eof $sock} err] && !$err} {
-            after 500 [list [self object] checkConnection]
+            set checkEventId [after 500 [list [self object] checkConnection]]
         } else {
             my disconnect
             set activity 1
