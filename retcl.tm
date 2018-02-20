@@ -28,7 +28,7 @@
 package require Tcl 8.6
 package require TclOO
 
-package provide retcl 0.3.0
+package provide retcl 0.3.1
 
 catch {retcl destroy}
 
