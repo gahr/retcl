@@ -13,6 +13,14 @@ tcltest::configure {*}$argv -singleproc 1 -testdir [file dir [info script]] \
             after 50 { set done 1 }
             vwait done
         }
+
+        proc startServer {} {
+            exec sudo service redis onestart
+        }
+
+        proc stopServer {} {
+            exec sudo service redis onestop
+        }
     }
 
 # Check that the server is up and running
