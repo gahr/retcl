@@ -818,12 +818,6 @@ oo::class create retcl {
         {*}$errorCallback $msg
         return -level 2
     }
-
-    ##
-    # Private part of the connection phase, using the `host' and `port'
-    # instance variables.
-    method DoConnect {} {
-    }
 }
 
 # vim: set ft=tcl ts=4 expandtab:
