@@ -54,3 +54,36 @@ tcltest::test connect-1.5 {reconnect from disconnected} -constraints {
 } -cleanup {
     $r destroy
 } -result 1
+
+tcltest::test connect-1.6 {reconnect failure} -constraints {
+    serverIsRunning
+} -body {
+    set ::result [list]
+    set r [retcl new]
+    lappend ::result [$r connected]
+    stopServer
+    $r errorHandler [list apply {{msg} { lappend ::result $msg }}]
+    $r reconnect
+    vwait ::result
+    lappend ::result [$r connected]
+} -cleanup {
+    startServer
+    $r destroy
+} -result {1 {Could not reconnect to Redis server} 0}
+
+tcltest::test connect-1.7 {reconnect success} -constraints {
+    serverIsRunning
+} -body {
+    set ::result [list]
+    set r [retcl new]
+    lappend ::result [$r connected]
+    stopServer
+    $r errorHandler [list apply {{msg} { lappend ::result $msg }}]
+    $r reconnect
+    after 3000 { startServer }
+    after 12000 { lappend ::result {no timeout} }
+    vwait ::result
+    lappend ::result [$r connected]
+} -cleanup {
+    $r destroy
+} -result {1 {no timeout} 1}

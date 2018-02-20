@@ -389,9 +389,9 @@ connected object\&.
 Disconnect from the Redis server\&.
 .TP
 \fIr\fR \fBreconnect\fR
-Try to reconnect to the server that was specified upon construction for up to
-10 seconds\&. If no connection can be established after this time, an error is
-reported using the \fIerror handler\fR\&.
+Return immediately, then try to reconnect to the server that was specified upon
+construction for up to 10 seconds\&. If no connection can be established after
+this time, an error is reported using the \fIerror handler\fR\&.
 .TP
 \fIr\fR ?-sync? ?-cb cmdPrefix? \fBREDIS_CMD\fR ?arg \&.\&.\&.?
 Methods not explicitely defined by the \fBretcl\fR class are forwarded to

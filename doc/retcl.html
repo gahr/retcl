@@ -110,9 +110,9 @@ connected object.</p></dd>
 <dt><a name="5"><em>r</em> <b class="cmd">disconnect</b></a></dt>
 <dd><p>Disconnect from the Redis server.</p></dd>
 <dt><a name="6"><em>r</em> <b class="cmd">reconnect</b></a></dt>
-<dd><p>Try to reconnect to the server that was specified upon construction for up to
-10 seconds. If no connection can be established after this time, an error is
-reported using the <em>error handler</em>.</p></dd>
+<dd><p>Return immediately, then try to reconnect to the server that was specified upon
+construction for up to 10 seconds. If no connection can be established after
+this time, an error is reported using the <em>error handler</em>.</p></dd>
 <dt><a name="7"><em>r</em> <span class="opt">?-sync?</span> <span class="opt">?-cb cmdPrefix?</span> <b class="cmd">REDIS_CMD</b> <span class="opt">?arg ...?</span></a></dt>
 <dd><p>Methods not explicitely defined by the <b class="package">retcl</b> class are forwarded to
 Redis by concatenating the <b class="cmd">REDIS_CMD</b> and any optional arguments.
