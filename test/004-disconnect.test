@@ -1,3 +1,5 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
 tcltest::test disconnect-1.1 {disconnect} -constraints {
     serverIsRunning
 } -setup {
