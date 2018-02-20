@@ -35,8 +35,8 @@ catch {retcl destroy}
 oo::class create retcl {
 
     ##
-    # Mapping of RESP data types to symbolic names, see
-    # http://redis.io/topics/protocol
+    # Mapping of RESP data types to symbolic names.
+    # See http://redis.io/topics/protocol.
     variable typeNames 
 
     ##
@@ -49,7 +49,7 @@ oo::class create retcl {
     # invoked whenever a result is made available. Status is either 0 (not
     # replied) or 1 (replied). Type is one of the values of the typeNames list.
     # New commands are appended at the tail of the list; responses are inserted
-    # at the first command with a status 0. Example given:
+    # at the first command with a status 0.
     #
     # rds:1 {
     #    status   (0|1)
@@ -57,11 +57,11 @@ oo::class create retcl {
     #    type     (SimpleString|...)
     #    response (RESPONSE)
     # }
-    #
     variable resultsCache
 
     ##
-    # Read buffer
+    # Read buffer. This is appended to incrementally to handle partial reads
+    # from the server.
     variable readBuf
 
     ##
@@ -128,18 +128,20 @@ oo::class create retcl {
             *   Array
         }
         set resultsCache [dict create]
+        set keepCache 1
+        set async 1
         set cmdIdNumber 0
+        set host {}
+        set port {}
         set sock {}
-        set opMode interactive
         set callbacks [dict create]
+        set errorCallback error
         set pipeline {}
         set isPipelined 0
         set checkEventId {}
         set reconnectEventId {}
+        set activity 0
 
-        my +keepCache
-        my +async
-        my errorHandler
         if {$a_host ne {-noconnect}} {
             my connect $a_host $a_port
         }
@@ -183,7 +185,7 @@ oo::class create retcl {
         }
         set saveErrorCallback $errorCallback
         my errorHandler {}
-        if {[info exists host] && [info exists port]} {
+        if {$host ne {} && $port ne {}} {
             set connect_cmd [list connect $host $port]
         } else {
             set connect_cmd [list connect]
@@ -194,6 +196,7 @@ oo::class create retcl {
             set reconnectEventId \
                 [after $waitMillis [list [self object] reconnect [incr i]]]
         }
+        return {}
     }
 
     ##
@@ -614,7 +617,7 @@ oo::class create retcl {
 
     ##
     # Handle a complete result read from the server.
-    method HandleResult {type body} { 
+    method HandleResult {type body} {
         # We have to handle two distinct cases:
         # - a pushed message (can be message, subscribe, or ubsubscribe)
         # - a command response
