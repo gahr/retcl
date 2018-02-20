@@ -2,7 +2,7 @@
 '\" Generated from file 'retcl\&.man' by tcllib/doctools with format 'nroff'
 '\" Copyright (c) 2014-2017 Pietro Cerutti <gahr@gahr\&.ch>
 '\"
-.TH "retcl" n 0\&.3\&.0 retcl "Redis client"
+.TH "retcl" n 0\&.3\&.1 retcl "Redis client"
 .\" The -*- nroff -*- definitions below are for supplemental macros used
 .\" in Tcl/Tk manual entries.
 .\"
