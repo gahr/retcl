@@ -6,6 +6,21 @@ package require tcltest 2.3
 tcl::tm::path add [file join [file dirname [info script]] .. ]
 package require retcl
 
+proc pre {} {
+    retcl create r
+    set keys [r -sync info Keyspace]
+    if {$keys ne "# Keyspace\r\n"} {
+        error "Refusing to run tests on a non-empty database:\n\n$keys"
+    }
+    r destroy
+}
+
+proc post {} {
+    retcl create r
+    r flushall
+    r destroy
+}
+
 tcltest::configure {*}$argv -singleproc 1 -testdir [file dir [info script]] \
     -load {
         proc runEvents {} {
@@ -31,4 +46,6 @@ if {[catch {socket localhost 6379} fd]} {
     close $fd
 }
 
+pre
 tcltest::runAllTests
+post
