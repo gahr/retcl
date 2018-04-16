@@ -1,32 +1,33 @@
 [comment {-*- tcl -*- doctools manpage}]
 [manpage_begin retcl n 0.3.1]
-[moddesc {Redis client}]
-[titledesc {Tcl client library for Redis}]
+[moddesc {Tcl client library for Redis}]
 [require Tcl 8.6]
 [require TclOO 1.0]
 
-[copyright {2014-2017 Pietro Cerutti <gahr@gahr.ch>}]
+[copyright {2014-2018 Pietro Cerutti <gahr@gahr.ch>}]
 
 [description]
+
 The [package retcl] module is an event-driven, object-oriented, Redis client
-library, which API exposes a single [package retcl] class. Objects of this
-class represent connections to a Redis server and are used to send requests as
-commands and retrieve responses.
+library for the Tcl programming language. The library exposes a single
+[cmd retcl] class. Instances of this class represent connections to a Redis
+server and are used to send requests in the form of native Redis commands and
+retrieve responses.
 
 [para]
 
-Other than a few book-keeping methods, instance objects of the [package retcl]
-class transparently handle Redis commands as first-class methods. As an
-example, [example {r SET K Hello}] can be used to set the value of the key
-[emph K] to the string [emph Hello]. This is achieved by proxying all unknown
-methods to the Redis server by concatenating all arguments, effectively making
-the [package retcl] package completely decoupled from any version of Redis.
+Other than a few book-keeping methods, [cmd retcl] instances transparently
+handle Redis commands as first-class methods.
+As an example, [example {r SET K Hello}] can be used to set the value of the
+key [emph K] to the string [emph Hello]. This is achieved by proxying all
+unknown methods to the Redis server by concatenating all arguments, effectively
+making [cmd retcl] instances completely decoupled from any version of Redis.
 This has several advantages:
 
 [list_begin item]
-[item] The [package retcl] package does not need to know about the semantics of
-a particular Redis command. This includes syntax checks, context verification
-and arguments validation, which are offloaded to the Redis server. As a
+[item] A [cmd retcl] instance does not need to know about the semantics of a
+particular Redis command. This includes syntax checks, context verification and
+arguments validation, which are offloaded to the Redis server. As a
 consequence, the code base remains clean and small.
 [item] New commands introduced by a server upgrade are immediately available to
 a live application.
@@ -38,8 +39,8 @@ a live application.
 
 [call [cmd {retcl create}] [arg r] [opt hostname] [opt port]]
 
-Create a new [package retcl] object and automatically connects to the Redis
-server at [arg hostname]:[arg port]. The [arg hostname] argument defaults to
+Create a new [cmd retcl] object and automatically connects to the Redis server
+at [arg hostname]:[arg port]. The [arg hostname] argument defaults to
 127.0.0.1. The [arg port] argument defaults to 6379.
 
 [para]
@@ -54,7 +55,7 @@ server on 192.168.1.3, default port 6379:
 
 [call [cmd {retcl create}] [arg r] -noconnect]
 
-Create a new [package retcl] object in disconnected mode. The object can be
+Create a new [cmd retcl] object in disconnected mode. The object can be
 connected further on using the [cmd connect] or [cmd reconnect].
 
 [call [emph r] [cmd connected]]
@@ -90,18 +91,24 @@ this time, an error is reported using the [emph {error handler}].
 
 [call [emph r] [opt -sync] [opt {-cb cmdPrefix}] [cmd REDIS_CMD] [opt {arg ...}]]
 
-Methods not explicitely defined by the [package retcl] class are forwarded to
-Redis by concatenating the [cmd REDIS_CMD] and any optional arguments.
-By default, commands are sent in asynchronous mode and immediately return a
-[emph cmdId] identifier that can be later used to retrieve the result. The
-default mode can be changed with the [cmd +async] and [cmd -async] commands.
-if [arg -sync] is specified, the command is sent synchronously and will wait
-until a response is available. The body of the response is returned.
-If [arg {-cb cmdPrefix}] is specified, the command is sent asynchronously and
-return a [emph cmdId] immediately. [emph cmdPrefix] will eventually be called
-when the response is available, with the [emph {cmdId}], type and body of the
-result as additional parameters.
-Either [arg -sync] or [arg {-cb cmdPrefix}] might be specified, but not both.
+Methods not explicitely defined by the [cmd retcl] class are forwarded to Redis
+by concatenating the [cmd REDIS_CMD] and any optional arguments.
+
+The mode of operation depends on the object-wide asynchronous mode set using
+the [cmd +async] and [cmd -async] commands. Synchronous operation can be forced
+by specifying the [arg -sync] argument.
+
+In asynchronous mode, Redis commands immediately return a [emph cmdId]
+identifier that can be later used to retrieve the result.
+
+In synchronous mode, Redis commands are blocking, and eventually return the
+body of the result, when it becomes available.
+
+A third variant of operation is accessible using the [arg {-cb cmdPrefix}]
+option. If specified, the command is sent asynchronously and return a
+[emph cmdId] immediately. When the response is available, a command is
+constructed and executed by appending the [emph {cmdId}], the type, and the
+body of the result to [emph cmdPrefix].
 
 [call [emph r] [cmd result] [opt -async] [arg cmdId]]
 
@@ -173,7 +180,7 @@ of off.
 [call [emph r] [cmd errorHandler] [opt cmdPrefix]]
 
 Set up an [emph {error handler}] to be called whenever an asynchronous error
-occurs inside the [package retcl] package. The [arg cmdPrefix] is appended an
+occurs inside the [cmd retcl] class. The [arg cmdPrefix] is appended an
 error message. If [arg cmdPrefix] is the empty string, the [emph {error
 handler}] is restored to the default [cmd error] command. This command returns
 the old [arg cmdPrefix].
