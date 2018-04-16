@@ -386,11 +386,19 @@ Either remove the result of the command identified by ***command identifier***
 Switch on or off keeping results in the cache after the client has retrieven
 them using the `result` method. By default, the results cache is enabled.
 
+    r ?keepCache
+
+Query the current setting of `keepCache`.
+
     r +async
     r -async
 
 Switch on or off the asynchronous operation mode. By default, asynchronous
 operation is enabled.
+
+    r ?async
+
+Query the current setting of `async`.
 
     r pipeline script
     

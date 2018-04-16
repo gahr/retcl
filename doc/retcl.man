@@ -146,6 +146,10 @@ Turn on the use of the [emph {results cache}]. This is the default.
 Turn off the use of the [emph {results cache}]. Results are removed from the
 cache as soon as they are retrieved.
 
+[call [emph r] [cmd ?keepCache]]
+
+Return a boolean value indicating whether cache keeping is currently on or off.
+
 [call [emph r] [cmd clearResult] [opt cmdId]]
 
 Remove the result for [opt cmdId] from the [emph {results cache}] or clear it
@@ -160,6 +164,11 @@ a [emph {command identifier}].
 
 Turn off asynchronous operation. In this mode, commands wait until a response
 is received and return the body.
+
+[call [emph r] [cmd ?async]]
+
+Return a boolean value indicating whether asynchronous operation is currenty on
+of off.
 
 [call [emph r] [cmd errorHandler] [opt cmdPrefix]]
 
