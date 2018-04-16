@@ -1,8 +1,8 @@
 '\"
 '\" Generated from file 'retcl\&.man' by tcllib/doctools with format 'nroff'
-'\" Copyright (c) 2014-2017 Pietro Cerutti <gahr@gahr\&.ch>
+'\" Copyright (c) 2014-2018 Pietro Cerutti <gahr@gahr\&.ch>
 '\"
-.TH "retcl" n 0\&.3\&.1 retcl "Redis client"
+.TH "retcl" n 0\&.3\&.1 retcl "Tcl client library for Redis"
 .\" The -*- nroff -*- definitions below are for supplemental macros used
 .\" in Tcl/Tk manual entries.
 .\"
@@ -304,11 +304,15 @@ package require \fBTclOO  1\&.0\fR
 .sp
 \fIr\fR \fB-keepCache\fR
 .sp
+\fIr\fR \fB?keepCache\fR
+.sp
 \fIr\fR \fBclearResult\fR ?cmdId?
 .sp
 \fIr\fR \fB+async\fR
 .sp
 \fIr\fR \fB-async\fR
+.sp
+\fIr\fR \fB?async\fR
 .sp
 \fIr\fR \fBerrorHandler\fR ?cmdPrefix?
 .sp
@@ -319,26 +323,27 @@ package require \fBTclOO  1\&.0\fR
 .BE
 .SH DESCRIPTION
 The \fBretcl\fR module is an event-driven, object-oriented, Redis client
-library, which API exposes a single \fBretcl\fR class\&. Objects of this
-class represent connections to a Redis server and are used to send requests as
-commands and retrieve responses\&.
+library for the Tcl programming language\&. The library exposes a single
+\fBretcl\fR class\&. Instances of this class represent connections to a Redis
+server and are used to send requests in the form of native Redis commands and
+retrieve responses\&.
 .PP
-Other than a few book-keeping methods, instance objects of the \fBretcl\fR
-class transparently handle Redis commands as first-class methods\&. As an
-example,
+Other than a few book-keeping methods, \fBretcl\fR instances transparently
+handle Redis commands as first-class methods\&.
+As an example,
 .CS
 
 r SET K Hello
 .CE
-can be used to set the value of the key
-\fIK\fR to the string \fIHello\fR\&. This is achieved by proxying all unknown
-methods to the Redis server by concatenating all arguments, effectively making
-the \fBretcl\fR package completely decoupled from any version of Redis\&.
+can be used to set the value of the
+key \fIK\fR to the string \fIHello\fR\&. This is achieved by proxying all
+unknown methods to the Redis server by concatenating all arguments, effectively
+making \fBretcl\fR instances completely decoupled from any version of Redis\&.
 This has several advantages:
 .IP \(bu
-The \fBretcl\fR package does not need to know about the semantics of
-a particular Redis command\&. This includes syntax checks, context verification
-and arguments validation, which are offloaded to the Redis server\&. As a
+A \fBretcl\fR instance does not need to know about the semantics of a
+particular Redis command\&. This includes syntax checks, context verification and
+arguments validation, which are offloaded to the Redis server\&. As a
 consequence, the code base remains clean and small\&.
 .IP \(bu
 New commands introduced by a server upgrade are immediately available to
@@ -347,8 +352,8 @@ a live application\&.
 .SH COMMANDS
 .TP
 \fBretcl create\fR \fIr\fR ?hostname? ?port?
-Create a new \fBretcl\fR object and automatically connects to the Redis
-server at \fIhostname\fR:\fIport\fR\&. The \fIhostname\fR argument defaults to
+Create a new \fBretcl\fR object and automatically connects to the Redis server
+at \fIhostname\fR:\fIport\fR\&. The \fIhostname\fR argument defaults to
 127\&.0\&.0\&.1\&. The \fIport\fR argument defaults to 6379\&.
 .sp
 Example: create a Redis client object named \fIr\fR and connect to the Redis
@@ -394,18 +399,20 @@ construction for up to 10 seconds\&. If no connection can be established after
 this time, an error is reported using the \fIerror handler\fR\&.
 .TP
 \fIr\fR ?-sync? ?-cb cmdPrefix? \fBREDIS_CMD\fR ?arg \&.\&.\&.?
-Methods not explicitely defined by the \fBretcl\fR class are forwarded to
-Redis by concatenating the \fBREDIS_CMD\fR and any optional arguments\&.
-By default, commands are sent in asynchronous mode and immediately return a
-\fIcmdId\fR identifier that can be later used to retrieve the result\&. The
-default mode can be changed with the \fB+async\fR and \fB-async\fR commands\&.
-if \fI-sync\fR is specified, the command is sent synchronously and will wait
-until a response is available\&. The body of the response is returned\&.
-If \fI-cb cmdPrefix\fR is specified, the command is sent asynchronously and
-return a \fIcmdId\fR immediately\&. \fIcmdPrefix\fR will eventually be called
-when the response is available, with the \fIcmdId\fR, type and body of the
-result as additional parameters\&.
-Either \fI-sync\fR or \fI-cb cmdPrefix\fR might be specified, but not both\&.
+Methods not explicitely defined by the \fBretcl\fR class are forwarded to Redis
+by concatenating the \fBREDIS_CMD\fR and any optional arguments\&.
+The mode of operation depends on the object-wide asynchronous mode set using
+the \fB+async\fR and \fB-async\fR commands\&. Synchronous operation can be forced
+by specifying the \fI-sync\fR argument\&.
+In asynchronous mode, Redis commands immediately return a \fIcmdId\fR
+identifier that can be later used to retrieve the result\&.
+In synchronous mode, Redis commands are blocking, and eventually return the
+body of the result, when it becomes available\&.
+A third variant of operation is accessible using the \fI-cb cmdPrefix\fR
+option\&. If specified, the command is sent asynchronously and return a
+\fIcmdId\fR immediately\&. When the response is available, a command is
+constructed and executed by appending the \fIcmdId\fR, the type, and the
+body of the result to \fIcmdPrefix\fR\&.
 .TP
 \fIr\fR \fBresult\fR ?-async? \fIcmdId\fR
 Return the result of the command identified by \fIcmdId\fR\&. If the response is
@@ -444,6 +451,9 @@ Turn on the use of the \fIresults cache\fR\&. This is the default\&.
 Turn off the use of the \fIresults cache\fR\&. Results are removed from the
 cache as soon as they are retrieved\&.
 .TP
+\fIr\fR \fB?keepCache\fR
+Return a boolean value indicating whether cache keeping is currently on or off\&.
+.TP
 \fIr\fR \fBclearResult\fR ?cmdId?
 Remove the result for ?cmdId? from the \fIresults cache\fR or clear it
 entirely\&.
@@ -456,9 +466,13 @@ a \fIcommand identifier\fR\&.
 Turn off asynchronous operation\&. In this mode, commands wait until a response
 is received and return the body\&.
 .TP
+\fIr\fR \fB?async\fR
+Return a boolean value indicating whether asynchronous operation is currenty on
+of off\&.
+.TP
 \fIr\fR \fBerrorHandler\fR ?cmdPrefix?
 Set up an \fIerror handler\fR to be called whenever an asynchronous error
-occurs inside the \fBretcl\fR package\&. The \fIcmdPrefix\fR is appended an
+occurs inside the \fBretcl\fR class\&. The \fIcmdPrefix\fR is appended an
 error message\&. If \fIcmdPrefix\fR is the empty string, the \fIerror
 handler\fR is restored to the default \fBerror\fR command\&. This command returns
 the old \fIcmdPrefix\fR\&.
@@ -491,6 +505,6 @@ message)\&.
 .PP
 .SH COPYRIGHT
 .nf
-Copyright (c) 2014-2017 Pietro Cerutti <gahr@gahr\&.ch>
+Copyright (c) 2014-2018 Pietro Cerutti <gahr@gahr\&.ch>
 
 .fi
