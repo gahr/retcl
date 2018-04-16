@@ -240,6 +240,13 @@ oo::class create retcl {
     export -async
 
     ##
+    # Query the currenct asynchronous operation mode.
+    method ?async {} {
+        set async
+    }
+    export ?async
+
+    ##
     # Turn on keeping results in the cache.
     method +keepCache {} {
         set keepCache 1
@@ -252,6 +259,13 @@ oo::class create retcl {
         set keepCache 0
     }
     export -keepCache
+
+    ##
+    # Query the current cache keeping mode.
+    method ?keepCache {} {
+        set keepCache
+    }
+    export ?keepCache
 
     ##
     # Setup and error callback or restore the default one ([error]). The
