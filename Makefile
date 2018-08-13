@@ -4,16 +4,16 @@ TCLSH?=	tclsh8.6
 
 all: doc test
 
-doc: retcl.n retcl.html
+doc: doc/retcl.n doc/retcl.html
 
-retcl.n: retcl.adoc
-	asciidoctor -b manpage -o retcl.n retcl.adoc
+doc/retcl.n: doc/retcl.adoc README.adoc
+	asciidoctor -b manpage -o doc/retcl.n doc/retcl.adoc
 
-retcl.html: retcl.adoc
-	asciidoctor -b xhtml5 -o retcl.html retcl.adoc
+doc/retcl.html: doc/retcl.adoc README.adoc
+	asciidoctor -b xhtml5 -o doc/retcl.html doc/retcl.adoc
 
 test:
 	${TCLSH} test/all.tcl
 
 clean:
-	rm -f retcl.n retcl.html
+	rm -f doc/retcl.n doc/retcl.html
