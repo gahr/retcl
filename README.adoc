@@ -1,7 +1,5 @@
 ifeval::["{manmanual}" == ""]
-= retcl
-
-Tcl client library for Redis.
+= retcl: Tcl client library for Redis
 endif::[]
 
 The retcl module is an event-driven, object-oriented, https://redis.io[Redis]
@@ -20,12 +18,13 @@ instances completely decoupled from any version of Redis.  This has several
 advantages:
 
 * A `retcl` instance does not need to know about the semantics of a
-particular https://redis.io[Redis] command. This includes syntax checks,
-context verification and arguments validation, which are offloaded to the
-https://redis.io[Redis] server. As a consequence, the code base remains clean
-and small.
+  particular https://redis.io[Redis] command. This includes syntax checks,
+  context verification and arguments validation, which are offloaded to the
+  https://redis.io[Redis] server. As a consequence, the code base remains clean
+  and small.
+
 * New commands introduced by a server upgrade are immediately available to
-a live application.
+  a live application.
 
 ifeval::["{manmanual}" == ""]
 
@@ -37,7 +36,6 @@ r SET key val
 r -sync GET key ;# val
 ----
 
-ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 See the link:doc/retcl{outfilesuffix}[User Manual] for the full documentation.
 
 endif::[]
