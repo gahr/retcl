@@ -6,7 +6,7 @@ endif::[]
 
 The retcl module is an event-driven, object-oriented, https://redis.io[Redis]
 client library for the https://www.tcl-lang.org/[Tcl] programming language. The
-library exposes a single `retcl` class, conveniently packaged as a sourcable
+library exposes a single `retcl` class, conveniently packaged as a sourceable
 https://www.tcl-lang.org/man/tcl8.6/TclCmd/tm.htm#M9[Tcl module].  Instances of
 this class represent connections to a Redis server and are used to send
 requests in the form of native Redis commands and retrieve responses.
