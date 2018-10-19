@@ -21,6 +21,8 @@ a live application.
 
 ifeval::["{manmanual}" == ""]
 
-See retcl.adoc for the full documentation.
+See https://github.com/gahr/retcl/blob/adoc/retcl.adoc[retcl.adoc] for the full
+documentation.
+
 
 endif::[]
