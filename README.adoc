@@ -4,14 +4,15 @@ ifeval::["{manmanual}" == ""]
 Tcl client library for Redis.
 endif::[]
 
-The retcl module is an event-driven, object-oriented, Redis client library
-for the Tcl programming language. The library exposes a single `retcl`
-class.  Instances of this class represent connections to a Redis server and are
-used to send requests in the form of native Redis commands and retrieve
-responses.
+The retcl module is an event-driven, object-oriented, https://redis.io[Redis]
+client library for the https://www.tcl-lang.org/[Tcl] programming language. The
+library exposes a single `retcl` class, conveniently packaged as a sourcable
+https://www.tcl-lang.org/man/tcl8.6/TclCmd/tm.htm#M9[Tcl module].  Instances of
+this class represent connections to a Redis server and are used to send
+requests in the form of native Redis commands and retrieve responses.
 
 Other than a few book-keeping methods, `retcl` instances transparently
-handle Redis commands as first-class methods.
+handle https://redis.io[Redis] commands as first-class methods.
 As an example, `r SET K Hello` can be used to set the value of the key _K_
 to the string _Hello_. This is achieved by proxying all unknown methods to the
 Redis server by concatenating all arguments, effectively making `retcl`
@@ -19,9 +20,10 @@ instances completely decoupled from any version of Redis.  This has several
 advantages:
 
 * A `retcl` instance does not need to know about the semantics of a
-particular Redis command. This includes syntax checks, context verification and
-arguments validation, which are offloaded to the Redis server. As a
-consequence, the code base remains clean and small.
+particular https://redis.io[Redis] command. This includes syntax checks,
+context verification and arguments validation, which are offloaded to the
+https://redis.io[Redis] server. As a consequence, the code base remains clean
+and small.
 * New commands introduced by a server upgrade are immediately available to
 a live application.
 
