@@ -21,6 +21,14 @@ a live application.
 
 ifeval::["{manmanual}" == ""]
 
+[source,tcl]
+----
+package require retcl
+retcl create r
+r SET key val
+r -sync GET key ;# val
+----
+
 See https://github.com/gahr/retcl/blob/adoc/retcl.adoc[retcl.adoc] for the full
 documentation.
 
