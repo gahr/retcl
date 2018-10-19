@@ -1,3 +1,7 @@
+ifeval::["{manmanual}" == ""]
+== Retcl
+endif::[]
+
 The retcl module is an event-driven, object-oriented, Redis client library
 for the Tcl programming language. The library exposes a single `retcl`
 class.  Instances of this class represent connections to a Redis server and are
@@ -29,8 +33,7 @@ r SET key val
 r -sync GET key ;# val
 ----
 
-See https://github.com/gahr/retcl/blob/adoc/retcl.adoc[retcl.adoc] for the full
-documentation.
-
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+See the link:doc/retcl{outfilesuffix}[User Manual] for the full documentation.
 
 endif::[]

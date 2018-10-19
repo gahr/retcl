@@ -60,7 +60,7 @@ Retcl - Redis client library for Tcl
 
 == Description
 
-include::README.adoc[]
+include::../README.adoc[]
 
 == Methods
 
