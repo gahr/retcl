@@ -9,4 +9,4 @@ doc/retcl.n: doc/retcl.adoc README.adoc
 	asciidoctor -b manpage -o doc/retcl.n doc/retcl.adoc
 
 doc/retcl.html: doc/retcl.adoc README.adoc
-	asciidoctor -b xhtml5 -o doc/retcl.html doc/retcl.adoc
+	asciidoctor -a toc -d article -b xhtml5 -o doc/retcl.html doc/retcl.adoc

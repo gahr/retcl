@@ -1,5 +1,4 @@
 = retcl(n)
-=================================
 :author:        Pietro Cerutti
 :email:         gahr@gahr.ch
 :revdate:       August 10, 2018
