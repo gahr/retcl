@@ -477,18 +477,6 @@ oo::class create retcl {
     ##########################################################################
 
     ##
-    # Read a BulkString from the server. Might be partial.
-    method GetBulkString {len} {
-        set buf [read $sock $toRead]
-
-        if {[string length $buf] == $toRead} {
-            gets $sock ;# Consumje the final newline
-        }
-
-        return $buf
-    }
-
-    ##
     # Handle a read event from the socket.
     #
     # Must be public (starts with a lower case letter) because it's used in the
