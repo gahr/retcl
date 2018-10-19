@@ -1,198 +1,21 @@
-= retcl(n)
-=================================
-:author:        Pietro Cerutti
-:email:         gahr@gahr.ch
-:revdate:        August 10, 2018
-:revnumber:     0.3.2
-:package:       retcl
-:doctype:       manpage
-:manmanual:     RETCL
-:mansource:     RETCL
-:man-linkstyle: pass:[blue R<>]
-
-== Name
-
-Retcl - Redis client library for Tcl
-
-== Synopsis
-
-`package require *{package}*`
-
-`*{package}* create _?objectName?_ _?-noconnect?_ _?host?_ _?port?_`
-
-`set r [*{package}* new _?-noconnect?_ _?host?_ _?port?_]`
-
-`*$r* connect _?host?_ _?port?_`
-
-`*$r* disconnect`
-
-`*$r* connected`
-
-`*$r* _?-sync?_ _?-cb?_ _redisCmd_ _?redisArg ...?_`
-
-`*$r* result _?async?_ _commandId_`
-
-`*$r* resultReady _commandId_`
-
-`*$r* resultType _commandId_`
-
-`*$r* allResults`
-
-`*$r* clearResult _?commandId?_`
-
-`*$r* +async`
-
-`*$r* -async`
-
-`*$r* ?async`
-
-`*$r* +keepCache`
-
-`*$r* -keepCache`
-
-`*$r* ?keepCache`
-
-`*$r* errorHandler _?cmdPrefix?_`
-
-`*$r* pipeline _script_`
-
-`*$r* callback _item_ _?callback?_`
-
-== Description
-
-The {package} module is an event-driven, object-oriented, Redis client library
-for the Tcl programming language. The library exposes a single `{package}`
+The retcl module is an event-driven, object-oriented, Redis client library
+for the Tcl programming language. The library exposes a single `retcl`
 class.  Instances of this class represent connections to a Redis server and are
 used to send requests in the form of native Redis commands and retrieve
 responses.
 
-Other than a few book-keeping methods, `{package}` instances transparently
+Other than a few book-keeping methods, `retcl` instances transparently
 handle Redis commands as first-class methods.
 As an example, `r SET K Hello` can be used to set the value of the key _K_
 to the string _Hello_. This is achieved by proxying all unknown methods to the
-Redis server by concatenating all arguments, effectively making `{package}`
+Redis server by concatenating all arguments, effectively making `retcl`
 instances completely decoupled from any version of Redis.  This has several
 advantages:
 
-* A `{package}` instance does not need to know about the semantics of a
+* A `retcl` instance does not need to know about the semantics of a
 particular Redis command. This includes syntax checks, context verification and
 arguments validation, which are offloaded to the Redis server. As a
 consequence, the code base remains clean and small.
 * New commands introduced by a server upgrade are immediately available to
 a live application.
 
-== Methods
-
-=== Construction
-
-[source,tcl]
-----
-set r [retcl new ?-noconnect? ?host? ?port?]
-retcl create r ?-noconnect? ?host? ?port?
-----
-
-Create an instance *r* of `{package}`. By default, the client automatically
-connects to localhost on port 6379. If `-noconnect` is specified, the client is
-created in disconnected mode.
-
-=== Connection / disconnection
-
-[source,tcl]
-----
-$r connect ?host? ?port?
-$r disconnect
-$r connected
-----
-
-The `connect` method can be used to connect to a different host and port. It is
-an error to call this method on an already connected client. The `disconnect`
-method can be called no matter the connection status; it disconnects the client
-from the current host, if any. The `connected` method can be used to query the
-current connection status. It returns a true result if the client is connected
-and a false result otherwise.
-
-=== Interaction with Redis
-
-[source,tcl]
-----
-set rid1 [$r SET key val] ;# rid stands for result id
-$r result $rid1 ;# OK
-
-set rid2 [$r GET key]
-$r result $rid2] ;# val
-
-$r resultType $rid1 ;# SimpleString
-$r resultType $rid2 ;# BulkString
-
-$r -sync GET key ;# val
-
-proc mycb {id type body} {
-    puts "  id: $id"
-    puts "type: $type"
-    puts "body: $body"
-}
-
-$r -cb mycb GET key ;# returns immediately and arrange for mycb to be invoked
-                    ;# with {rds:1 BulkString val} when the result arrives
-----
-
-As shown in the examples above, the interaction with Redis is very
-straightforwards. Any methods not directly understood by the `{package}` class
-are forwarded to the Redis server, along with any additional arguments
-provided. The result is a small string representing a result id. Each call to
-Redis produces a new result id, which can then be queried to inspect its
-status, type, and value.
-
-By using the `-sync` switch, it is possible to have Redis commands block and
-only return as soon as the result is available. In this case, the return value
-is the value returned by Redis.
-
-By using the `-cb` switch, it is possible to arrange for a callback procedure
-to be called whenever the result is ready. In this case, the command returns
-immediately.
-
-=== Configuration
-
-By default, `{package}` objects operate in asynchronous mode: they return
-immediately and produce a result id (rid) that can be inspected later on. The
-methods `-async`, `+async` and `?async` can be used to disable, enbale, and
-query this setting. The asynchronous behaviour is off, methods wait and
-return the values returned by Redis instead of a result id.
-
-A cache of all results is kept by default. This allows to query previously
-returned results. The `-keepcache`, `+keepcache`, and `?keepcache` methods can
-be used to disable, enable, and query this setting. When the results cache is
-disabled, results are removed from the cache as soon as they are retrieved by
-the client.
-
-=== Error handling
-
-A custom error handler can be setup with the `errorHandler` method. The
-argument is a command prefix that gets expanded and additioned with an error
-message string. Passing an empty command prefix resets the error handler to the
-default `error` proc.
-
-=== Pipelining
-
-A pipeline can be built with the `pipeline` method. The argument is a script
-which gets evaluated in the context of the caller. Commands to the Redis server
-are held for the duration of the script and released as a bulk when the script
-ends.
-
-=== Publish / subscribe
-
-Publish / subscribe callbacks for specific items can be specified with the
-`callback` method. The `item` argument is a pattern or channel as in PSUBSCRIBE
-and SUBSCRIBE. The `callback` argument is a command prefix. Whenever a message
-arrives on the specific channel, the command prefix is called by appending the
-type of the message, the pattern that was subscribed to, the actual channel,
-and the payload.
-
-== Resources
-
-Project code repository: https://github.com/gahr/retcl
-
-== Copying
-
-Copyright (C) 2014-2018 {author}.
-Free use of this software is granted under the terms of the BSD License.

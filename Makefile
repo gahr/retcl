@@ -6,11 +6,11 @@ all: doc test
 
 doc: retcl.n retcl.html
 
-retcl.n: README.adoc
-	asciidoctor -b manpage -o retcl.n README.adoc
+retcl.n: retcl.adoc
+	asciidoctor -b manpage -o retcl.n retcl.adoc
 
-retcl.html: README.adoc
-	asciidoctor -b xhtml5 -o retcl.html README.adoc
+retcl.html: retcl.adoc
+	asciidoctor -b xhtml5 -o retcl.html retcl.adoc
 
 test:
 	${TCLSH} test/all.tcl
