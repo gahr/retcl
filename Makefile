@@ -1,19 +1,11 @@
 TCLSH?=	tclsh8.6
 
-.PHONY: doc test
+SUBS=	test doc
 
-all: doc test
+all: ${SUBS:S/$$/-all/}
 
-doc: doc/retcl.n doc/retcl.html
+clean: ${SUBS:S/$$/-clean/}
 
-doc/retcl.n: doc/retcl.adoc README.adoc
-	asciidoctor -b manpage -o doc/retcl.n doc/retcl.adoc
-
-doc/retcl.html: doc/retcl.adoc README.adoc
-	asciidoctor -b xhtml5 -o doc/retcl.html doc/retcl.adoc
-
-test:
-	${TCLSH} test/all.tcl
-
-clean:
-	rm -f doc/retcl.n doc/retcl.html
+.for f in ${SUBS}
+.include "${f}/Makefile"
+.endfor
