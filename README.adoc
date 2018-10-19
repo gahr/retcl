@@ -1,5 +1,7 @@
 ifeval::["{manmanual}" == ""]
-== Retcl
+= retcl
+
+Tcl client library for Redis.
 endif::[]
 
 The retcl module is an event-driven, object-oriented, Redis client library
