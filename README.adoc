@@ -19,3 +19,8 @@ consequence, the code base remains clean and small.
 * New commands introduced by a server upgrade are immediately available to
 a live application.
 
+ifeval::["{manmanual}" == ""]
+
+See retcl.adoc for the full documentation.
+
+endif::[]
