@@ -102,7 +102,9 @@ r -sync GET key ;# val
 
 endif::generate_manpage[]
 
+ifdef::generate_manpage[]
 == Methods
+endif::generate_manpage[]
 
 === Construction
 
@@ -209,6 +211,7 @@ arrives on the specific channel, the command prefix is called by appending the
 type of the message, the pattern that was subscribed to, the actual channel,
 and the payload.
 
+ifdef::generate_manpage[]
 == Resources
 
 Project code repository: https://github.com/gahr/retcl
@@ -217,3 +220,4 @@ Project code repository: https://github.com/gahr/retcl
 
 Copyright (C) 2014-2018 {author}.
 Free use of this software is granted under the terms of the BSD License.
+endif::generate_manpage[]
