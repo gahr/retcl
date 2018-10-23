@@ -1,11 +1,14 @@
 TCLSH?=	tclsh8.6
 
-SUBS=	test doc
+all:
+	@echo "Supported targets: doc, test, clean"
 
-all: ${SUBS:S/$$/-all/}
+doc: README.adoc
+	asciidoctor -b manpage -a generate_manpage=yes -o retcl.n README.adoc
+	asciidoctor -b xhtml5  -a generate_manpage=yes -a toc -d article -o retcl.html README.adoc
 
-clean: ${SUBS:S/$$/-clean/}
+test:
+	${TCLSH} test/all.tcl
 
-.for f in ${SUBS}
-.include "${f}/Makefile"
-.endfor
+clean:
+	rm -f retcl.n retcl.html
