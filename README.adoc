@@ -221,5 +221,6 @@ Project code repository: https://github.com/gahr/retcl
 == Copying
 
 Copyright (C) 2014-2018 {author}.
-Free use of this software is granted under the terms of the BSD License.
+Free use of this software is granted under the terms of the BSD-2-Clause
+License.
 endif::generate_manpage[]
