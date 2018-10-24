@@ -8,9 +8,8 @@ package require retcl
 
 proc pre {} {
     retcl create r
-    set keys [r -sync info Keyspace]
-    if {$keys ne "# Keyspace\r\n"} {
-        error "Refusing to run tests on a non-empty database:\n\n$keys"
+    if {[expr {[r -sync DBSIZE] != 0}]} {
+        error "Refusing to run tests on a non-empty database."
     }
     r destroy
 }
