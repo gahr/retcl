@@ -32,20 +32,29 @@ package provide retcl 0.3.2
 
 catch {retcl destroy}
 
-oo::class create retcl {
-
+namespace eval ::retcl {
     ##
     # Mapping of RESP data types to symbolic names.
     # See http://redis.io/topics/protocol.
-    variable typeNames 
+    variable typeNames {
+        +   SimpleString
+        -   Error
+        :   Integer
+        $   BulkString
+        *   Array
+    }
 
     ##
     # Commands (outgoing) related to pub-sub
-    variable pubSubCommands
+    variable pubSubCommands [list psubscribe punsubscribe subscribe unsubscribe]
 
     ##
     # Messages (incoming) related to pub-sub
-    variable pubSubMessages
+    variable pubSubMessages [list message pmessage {*}$pubSubCommands]
+}
+
+
+oo::class create retcl {
 
     ##
     # Keep a cache of the commands sent and results received. Each command sent
@@ -128,15 +137,6 @@ oo::class create retcl {
     ##
     # Constructor -- connect to a Retcl server.
     constructor {{a_host 127.0.0.1} {a_port 6379}} {
-        set typeNames {
-            +   SimpleString
-            -   Error
-            :   Integer
-            $   BulkString
-            *   Array
-        }
-        set pubSubCommands [list psubscribe punsubscribe subscribe unsubscribe]
-        set pubSubMessages [list message pmessage {*}$pubSubCommands]
         set resultsCache [dict create]
         set keepCache 1
         set async 1
@@ -457,7 +457,7 @@ oo::class create retcl {
             return
         }
 
-        if {[string tolower [lindex $args 0]] in $pubSubCommands} {
+        if {[string tolower [lindex $args 0]] in $::retcl::pubSubCommands} {
             # These messages are part of the Pub/Sub protocol; we don't expect
             # a response.
             set cmdId {}
@@ -642,7 +642,7 @@ oo::class create retcl {
         # filling in the result.
 
         # If the response is a pushed message
-        if {$type eq {Array} && [lindex $body 0] in $pubSubMessages} {
+        if {$type eq {Array} && [lindex $body 0] in $::retcl::pubSubMessages} {
             if {[lindex $body 0] eq {pmessage}} {
                 lassign $body type pattern item data
             } else {
@@ -685,7 +685,7 @@ oo::class create retcl {
     ##
     # Get a return type string by its byte.
     method TypeName {byte} {
-        if {[catch {dict get $typeNames $byte} name]} {
+        if {[catch {dict get $::retcl::typeNames $byte} name]} {
             my Error "Invalid type byte: $byte"
         }
         set name
