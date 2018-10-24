@@ -50,7 +50,7 @@ namespace eval ::retcl {
 
     ##
     # Messages (incoming) related to pub-sub
-    variable pubSubMessages [list message pmessage {*}$pubSubCommands]
+    variable pubSubMessages [concat message pmessage $pubSubCommands]
 }
 
 oo::class create retcl {
