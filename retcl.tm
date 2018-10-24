@@ -40,6 +40,14 @@ oo::class create retcl {
     variable typeNames 
 
     ##
+    # Commands (outgoing) related to pub-sub
+    variable pubSubCommands
+
+    ##
+    # Messages (incoming) related to pub-sub
+    variable pubSubMessages
+
+    ##
     # Keep a cache of the commands sent and results received. Each command sent
     # to the server is assigned a unique identifier, which can be then used by
     # the user to retrieve the result (see [result] method).  The resultsCache
@@ -127,6 +135,8 @@ oo::class create retcl {
             $   BulkString
             *   Array
         }
+        set pubSubCommands [list psubscribe punsubscribe subscribe unsubscribe]
+        set pubSubMessages [list message pmessage {*}$pubSubCommands]
         set resultsCache [dict create]
         set keepCache 1
         set async 1
@@ -447,8 +457,7 @@ oo::class create retcl {
             return
         }
 
-        set pubSubCmds [list psubscribe punsubscribe subscribe unsubscribe]
-        if {[string tolower [lindex $args 0]] in $pubSubCmds} {
+        if {[string tolower [lindex $args 0]] in $pubSubCommands} {
             # These messages are part of the Pub/Sub protocol; we don't expect
             # a response.
             set cmdId {}
@@ -633,8 +642,7 @@ oo::class create retcl {
         # filling in the result.
 
         # If the response is a pushed message
-        # relevant callback, if any.
-        if {$type eq {Array} && [lindex $body 0] in {message pmessage psubscribe punsubscribe subscribe unsubscribe}} {
+        if {$type eq {Array} && [lindex $body 0] in $pubSubMessages} {
             if {[lindex $body 0] eq {pmessage}} {
                 lassign $body type pattern item data
             } else {
