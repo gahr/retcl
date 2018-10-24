@@ -21,3 +21,23 @@ tcltest::test query-state-1.3 {query true asynchronous state} -setup {
     $r +async
     $r ?async
 } -result {1}
+
+tcltest::test query-state-2.1 {query default cache keeping state} -setup {
+    set r [retcl new]
+} -body {
+    $r ?keepCache
+} -result {1}
+
+tcltest::test query-state-2.2 {query false cache keeping state} -setup {
+    set r [retcl new]
+} -body {
+    $r -keepCache
+    $r ?keepCache
+} -result {0}
+
+tcltest::test query-state-2.3 {query true cache keeping state} -setup {
+    set r [retcl new]
+} -body {
+    $r +keepCache
+    $r ?keepCache
+} -result {1}
