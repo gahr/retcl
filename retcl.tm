@@ -33,6 +33,15 @@ package provide retcl 0.3.2
 catch {retcl destroy}
 
 namespace eval ::retcl {
+
+    ##
+    # Default Redis endpoint address
+    variable defaultHost 127.0.0.1
+
+    ##
+    # Default Redis endpoint port
+    variable defaultPort 6379
+
     ##
     # Mapping of RESP data types to symbolic names.
     # See http://redis.io/topics/protocol.
@@ -135,13 +144,13 @@ oo::class create retcl {
 
     ##
     # Constructor -- connect to a Retcl server.
-    constructor {{a_host 127.0.0.1} {a_port 6379}} {
+    constructor {args} {
         set resultsCache [dict create]
         set keepCache 1
         set async 1
         set cmdIdNumber 0
-        set host {}
-        set port {}
+        set host $::retcl::defaultHost
+        set port $::retcl::defaultPort
         set sock {}
         set callbacks [dict create]
         set errorCallback error
@@ -151,8 +160,25 @@ oo::class create retcl {
         set reconnectEventId {}
         set activity 0
 
-        if {$a_host ne {-noconnect}} {
-            my connect $a_host $a_port
+        switch [llength $args] {
+            0 {
+                # connect to default host and port
+                my connect
+            }
+            1 {
+                if {[lindex $args 0] eq {-noconnect}} {
+                    # disconnected mode - nothing to do
+                } else {
+                    my Error "bad option \"[lindex $args 0]\": must be -noconnect"
+                }
+            }
+            2 {
+                lassign $args host port
+                my connect
+            }
+            default {
+                my Error "wrong # args: must be \"?host port?\" or \"-noconnect\""
+            }
         }
     }
 
@@ -164,18 +190,23 @@ oo::class create retcl {
 
     ##
     # Connect to a Redis server.
-    method connect {{a_host 127.0.0.1} {a_port 6379}} {
+    method connect {{a_host {}} {a_port {}}} {
         if {$sock ne {}} {
             my Error "Already connected"
         }
 
-        if {[catch {socket $a_host $a_port} res]} {
+        if {$a_host ne {}} {
+            set host $a_host
+        }
+        if {$a_port ne {}} {
+            set port $a_port
+        }
+
+        if {[catch {socket $host $port} res]} {
             my Error "Cannot connect: $res"
         }
 
         set sock $res
-        set host $a_host
-        set port $a_port
         chan configure $sock -blocking 0 -translation binary
         chan event $sock readable [list [self object] readEvent]
         set checkEventId [after 500 [list [self object] checkConnection]]
@@ -194,12 +225,7 @@ oo::class create retcl {
         }
         set saveErrorCallback $errorCallback
         my errorHandler {}
-        if {$host ne {} && $port ne {}} {
-            set connect_cmd [list connect $host $port]
-        } else {
-            set connect_cmd [list connect]
-        }
-        set err [catch {my {*}$connect_cmd} msg]
+        set err [catch {my connect $host $port} msg]
         my errorHandler $saveErrorCallback
         if {$err} {
             set reconnectEventId \
@@ -704,6 +730,9 @@ oo::class create retcl {
     # Send command(s) over to the Redis server. Each
     # argument is a list of words composing the command.
     method Send {args} {
+        if {[llength $args] > 1} {
+            my Error "Too many args: $args"
+        }
         foreach cmd $args {
             append pipeline "[my BuildResp {*}$cmd]\r\n"
         }
