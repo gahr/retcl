@@ -1,4 +1,4 @@
-TCLSH?=	tclsh8.6
+TCLSH?=	tclsh8.7
 
 all:
 	@echo "Supported targets: docs, man, test, clean"
