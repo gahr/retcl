@@ -215,8 +215,8 @@ ifdef::generate_manpage[]
 == Resources
 
 [%hardbreaks]
-Project page: https://gahr.github.io/retcl
-Project code repository: https://github.com/gahr/retcl
+Project page: https://code.ptrcrt.ch/retcl/
+Project code repository: https://code.ptrcrt.ch/retcl/dir?ci=tip
 
 == Copying
 
