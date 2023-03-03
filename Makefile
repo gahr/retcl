@@ -6,6 +6,7 @@ all:
 .PHONY: docs
 docs: README.adoc
 	asciidoctor -b xhtml5  -a generate_manpage=yes -a toc -d article -o docs/index.html README.adoc
+	sed -i '' "1s|^|<div class='fossil-doc' data-title='retcl - Redis client library for Tcl'>\n|" docs/index.html
 
 man: README.adoc
 	asciidoctor -b manpage -a generate_manpage=yes -o retcl.n README.adoc
