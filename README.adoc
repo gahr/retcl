@@ -14,10 +14,6 @@ ifdef::generate_manpage[]
 
 Retcl - Redis client library for Tcl
 
-== Code
-
-Project code repository: https://code.ptrcrt.ch/retcl/timeline
-
 == Synopsis
 
 `package require *retcl*`
@@ -220,7 +216,6 @@ ifdef::generate_manpage[]
 
 [%hardbreaks]
 Project page: https://code.ptrcrt.ch/retcl/
-Project code repository: https://code.ptrcrt.ch/retcl/timeline
 
 == Copying
 
