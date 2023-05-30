@@ -1,4 +1,7 @@
+# vim: set ts=4:
+
 TCLSH?=	tclsh8.7
+REPO=	fossil info | grep ^repository | awk '{print $$2}'
 
 all:
 	@echo "Supported targets: docs, man, test, clean"
