@@ -1,0 +1,14 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
+tcltest::loadTestedCommands
+
+tcltest::test utf8-1.1 {store and retrieve ghost} -setup {
+    set r [retcl new]
+} -body {
+    set result {}
+    foreach ghost [list wooo \U0001F47B] {
+        $r -sync set ghost [encoding convertto utf-8 $ghost]
+        lappend result [encoding convertfrom utf-8 [$r -sync get ghost]]
+    }
+    set result
+} -result "wooo \U0001F47B"
