@@ -142,7 +142,7 @@ set rid1 [$r SET key val] ;# rid stands for result id
 $r result $rid1 ;# OK
 
 set rid2 [$r GET key]
-$r result $rid2] ;# val
+$r result $rid2 ;# val
 
 $r resultType $rid1 ;# SimpleString
 $r resultType $rid2 ;# BulkString
@@ -179,7 +179,7 @@ immediately.
 By default, `retcl` objects operate in asynchronous mode: they return
 immediately and produce a result id (rid) that can be inspected later on. The
 methods `-async`, `+async` and `?async` can be used to disable, enbale, and
-query this setting. The asynchronous behaviour is off, methods wait and
+query this setting. When the asynchronous behaviour is off, methods wait and
 return the values returned by https://redis.io[Redis] instead of a result id.
 
 A cache of all results is kept by default. This allows to query previously
