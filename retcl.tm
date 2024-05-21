@@ -292,7 +292,7 @@ oo::class create retcl {
     export -async
 
     ##
-    # Query the currenct asynchronous operation mode.
+    # Query the current asynchronous operation mode.
     method ?async {} {
         set async
     }
@@ -313,7 +313,7 @@ oo::class create retcl {
     export -tls
 
     ##
-    # Query the currenct TLS connection mode.
+    # Query the current TLS connection mode.
     method ?tls {} {
         set tls
     }
