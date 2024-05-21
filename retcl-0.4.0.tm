@@ -101,6 +101,13 @@ oo::class create retcl {
     variable async
 
     ##
+    # Boolean to indicate whether the connection to the Redis server should be
+    # established using TLS (see +tls and -tls methods).
+    # This requires the tcltls extension available at
+    # https://core.tcl-lang.org/tcltls.
+    variable tls
+
+    ##
     # An incremental integer to track requests / responses.
     variable cmdIdNumber
 
@@ -148,6 +155,7 @@ oo::class create retcl {
         set resultsCache [dict create]
         set keepCache 1
         set async 1
+        set tls [info exists ::env(RETCL_TLS)]
         set cmdIdNumber 0
         set host $::retcl::defaultHost
         set port $::retcl::defaultPort
@@ -202,7 +210,16 @@ oo::class create retcl {
             set port $a_port
         }
 
-        if {[catch {socket $host $port} res]} {
+        if {$tls} {
+            if {[catch {package require tls} res]} {
+                my Error "Cannot load TLS extension: $res"
+            }
+            set socket_cmd tls::socket
+        } else {
+            set socket_cmd socket
+
+        }
+        if {[catch {$socket_cmd $host $port} res]} {
             my Error "Cannot connect: $res"
         }
 
@@ -280,6 +297,27 @@ oo::class create retcl {
         set async
     }
     export ?async
+
+    ##
+    # Turn on TLS connections.
+    method +tls {} {
+        set tls 1
+    }
+    export +tls
+
+    ##
+    # Turn off TLS connections.
+    method -tls {} {
+        set tls 0
+    }
+    export -tls
+
+    ##
+    # Query the currenct TLS connection mode.
+    method ?tls {} {
+        set tls
+    }
+    export ?tls
 
     ##
     # Turn on keeping results in the cache.
