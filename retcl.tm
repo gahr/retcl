@@ -155,7 +155,7 @@ oo::class create retcl {
         set resultsCache [dict create]
         set keepCache 1
         set async 1
-        set tls [info exists ::env(RETCL_TLS)]
+        set tls 0
         set cmdIdNumber 0
         set host $::retcl::defaultHost
         set port $::retcl::defaultPort
