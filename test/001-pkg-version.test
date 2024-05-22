@@ -2,4 +2,4 @@
 
 tcltest::test pkg-version-1.1 {pkg version is correct} -body {
     package require retcl
-} -result {0.4.0}
+} -result {0.5.0}
