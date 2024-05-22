@@ -101,6 +101,12 @@ oo::class create retcl {
     variable async
 
     ##
+    # This variable contains the arguments passed to the +tls method, or 0 if
+    # TLS is disabled. TLS requires the tcltls extension available at
+    # https://core.tcl-lang.org/tcltls.
+    variable tls
+
+    ##
     # An incremental integer to track requests / responses.
     variable cmdIdNumber
 
@@ -148,6 +154,7 @@ oo::class create retcl {
         set resultsCache [dict create]
         set keepCache 1
         set async 1
+        set tls 0
         set cmdIdNumber 0
         set host $::retcl::defaultHost
         set port $::retcl::defaultPort
@@ -202,7 +209,16 @@ oo::class create retcl {
             set port $a_port
         }
 
-        if {[catch {socket $host $port} res]} {
+        if {$tls ne {0}} {
+            if {[catch {package require tls} res]} {
+                my Error "Cannot load TLS extension: $res"
+            }
+            set socket_cmd [concat tls::socket $tls]
+        } else {
+            set socket_cmd [list socket]
+
+        }
+        if {[catch {{*}$socket_cmd $host $port} res]} {
             my Error "Cannot connect: $res"
         }
 
@@ -275,11 +291,34 @@ oo::class create retcl {
     export -async
 
     ##
-    # Query the currenct asynchronous operation mode.
+    # Query the current asynchronous operation mode.
     method ?async {} {
         set async
     }
     export ?async
+
+    ##
+    # Turn on TLS connections. If args is specified, it will be passed to
+    # tls::socket on connection.
+    method +tls {{args 1}} {
+        set tls $args
+        return 1
+    }
+    export +tls
+
+    ##
+    # Turn off TLS connections.
+    method -tls {} {
+        set tls 0
+    }
+    export -tls
+
+    ##
+    # Query the current TLS connection mode.
+    method ?tls {} {
+        expr {$tls ne {0}}
+    }
+    export ?tls
 
     ##
     # Turn on keeping results in the cache.

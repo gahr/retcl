@@ -20,9 +20,15 @@ proc pingpong {r id type pattern channel msg} {
     $r SUBSCRIBE [lindex $::chans $id]
 }
 
-proc run {id} {
+proc run {use_tls id} {
 
-    set r [retcl new]
+    set r [retcl new -noconnect]
+    if {$use_tls} {
+        $r +tls -cafile   /usr/local/etc/redis/ca.crt \
+                -certfile /usr/local/etc/redis/redis.crt \
+                -keyfile  /usr/local/etc/redis/redis.key
+    }
+    $r connect
     $r callback [lindex $::chans $id] [list pingpong $r $id]
 
     if {$id == 0} {
@@ -32,8 +38,9 @@ proc run {id} {
     $r SUBSCRIBE [lindex $::chans $id]
 }
 
-run 1
+set use_tls [expr {[lindex $::argv 0] eq {--tls}}]
+run $use_tls 1
 after 1000
-run 0
+run $use_tls 0
 
 vwait forever

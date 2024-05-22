@@ -46,6 +46,12 @@ Retcl - Redis client library for Tcl
 
 `*$r* ?async`
 
+`*$r* +tls _?args?_`
+
+`*$r* -tls`
+
+`*$r* ?tls`
+
 `*$r* +keepCache`
 
 `*$r* -keepCache`
@@ -210,6 +216,19 @@ and SUBSCRIBE. The `callback` argument is a command prefix. Whenever a message
 arrives on the specific channel, the command prefix is called by appending the
 type of the message, the pattern that was subscribed to, the actual channel,
 and the payload.
+
+== TLS
+
+The connection to the https://redis.io[Redis] server is unencrypted by default.
+If the https://core.tcl-lang.org/tcltls/index[TclTLS] extension is available,
+the `+tls` method can be used to enable TLS.  The method takes an optional list
+of arguments that are passed as-is to the `[tls::socket]` command.
+In the default configuration, https://redis.io[Redis] requires a valid client
+certificate on connection, which requires specifying a few parameters, e.g., 
+`r +tls -cafile /etc/redis/ca.crt -certfile /etc/redis/redis.crt -keyfile /etc/redis/redis.key`.
+The `-tls` and `?tls` methods can be used to disable and query TLS mode.
+The link:/retcl/file?name=examples/ping-pong.tcl[ping-pong example] can be run
+in TLS mode via `tclsh ping-pong.tcl --tls`.
 
 == Encoding
 
