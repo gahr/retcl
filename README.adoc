@@ -217,7 +217,7 @@ arrives on the specific channel, the command prefix is called by appending the
 type of the message, the pattern that was subscribed to, the actual channel,
 and the payload.
 
-=== TLS
+== TLS
 
 The connection to the https://redis.io[Redis] server is unencrypted by default.
 If the https://core.tcl-lang.org/tcltls/index[TclTLS] extension is available,
@@ -229,6 +229,16 @@ certificate on connection, which requires specifying a few parameters, e.g.,
 The `-tls` and `?tls` methods can be used to disable and query TLS mode.
 The link:/retcl/file?name=examples/ping-pong.tcl[ping-pong example] can be ran
 in TLS mode via `tclsh ping-pong.tcl --tls`.
+
+== Encoding
+
+As per the https://redis.io/docs/latest/develop/reference/protocol-spec/#resp-protocol-description[Redis Serialization Protocol (RESP)], 
+commands are sent over the wire as arrays of bulk strings. Bulk strings contain
+binary data, so all strings need to be converted to byte streams with values in
+the range 0-255. Unicode strings need to be encoded in utf-8.
+See the link:/retcl/file?ln=5&ci=f90952f00ba2ab6d&name=test%2F014-utf8.test[utf8-1.1]
+test for an example and link:/retcl/tktview/70c08b5b5d[ticket 70c08b5b5dfor]
+for details.
 
 ifdef::generate_manpage[]
 == Resources

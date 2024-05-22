@@ -460,9 +460,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_error_handling">Error handling</a></li>
 <li><a href="#_pipelining">Pipelining</a></li>
 <li><a href="#_publish_subscribe">Publish / subscribe</a></li>
-<li><a href="#_tls">TLS</a></li>
 </ul>
 </li>
+<li><a href="#_tls">TLS</a></li>
+<li><a href="#_encoding">Encoding</a></li>
 <li><a href="#_resources">Resources</a></li>
 <li><a href="#_copying">Copying</a></li>
 </ul>
@@ -717,8 +718,11 @@ type of the message, the pattern that was subscribed to, the actual channel,
 and the payload.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_tls">TLS</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tls">TLS</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The connection to the <a href="https://redis.io">Redis</a> server is unencrypted by default.
 If the <a href="https://core.tcl-lang.org/tcltls/index">TclTLS</a> extension is available,
@@ -731,6 +735,19 @@ The <code>-tls</code> and <code>?tls</code> methods can be used to disable and q
 The <a href="/retcl/file?name=examples/ping-pong.tcl">ping-pong example</a> can be ran
 in TLS mode via <code>tclsh ping-pong.tcl --tls</code>.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_encoding">Encoding</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As per the <a href="https://redis.io/docs/latest/develop/reference/protocol-spec/#resp-protocol-description">Redis Serialization Protocol (RESP)</a>,
+commands are sent over the wire as arrays of bulk strings. Bulk strings contain
+binary data, so all strings need to be converted to byte streams with values in
+the range 0-255. Unicode strings need to be encoded in utf-8.
+See the <a href="/retcl/file?ln=5&amp;ci=f90952f00ba2ab6d&amp;name=test%2F014-utf8.test">utf8-1.1</a>
+test for an example and <a href="/retcl/tktview/70c08b5b5d">ticket 70c08b5b5dfor</a>
+for details.</p>
 </div>
 </div>
 </div>
@@ -756,7 +773,7 @@ License.</p>
 <div id="footer">
 <div id="footer-text">
 Version 0.4.0<br/>
-Last updated 2024-05-22 09:11:48 UTC
+Last updated 2024-05-22 11:53:23 UTC
 </div>
 </div>
 </body>
