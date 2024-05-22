@@ -460,6 +460,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_error_handling">Error handling</a></li>
 <li><a href="#_pipelining">Pipelining</a></li>
 <li><a href="#_publish_subscribe">Publish / subscribe</a></li>
+<li><a href="#_tls">TLS</a></li>
 </ul>
 </li>
 <li><a href="#_resources">Resources</a></li>
@@ -523,6 +524,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="paragraph">
 <p><code><strong>$r</strong> ?async</code></p>
+</div>
+<div class="paragraph">
+<p><code><strong>$r</strong> +tls <em>?args?</em></code></p>
+</div>
+<div class="paragraph">
+<p><code><strong>$r</strong> -tls</code></p>
+</div>
+<div class="paragraph">
+<p><code><strong>$r</strong> ?tls</code></p>
 </div>
 <div class="paragraph">
 <p><code><strong>$r</strong> +keepCache</code></p>
@@ -707,6 +717,21 @@ type of the message, the pattern that was subscribed to, the actual channel,
 and the payload.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_tls">TLS</h3>
+<div class="paragraph">
+<p>The connection to the <a href="https://redis.io">Redis</a> server is unencrypted by default.
+If the <a href="https://core.tcl-lang.org/tcltls/index">TclTLS</a> extension is available,
+the <code>+tls</code> method can be used to enable TLS.  The method takes an optional list
+of arguments that are passed as-is to the <code>[tls::socket]</code> command.
+In the default configuration, <a href="https://redis.io">Redis</a> requires a valid client
+certificate on connection, which requires specifying a few parameters, e.g.,
+<code>r +tls -cafile /etc/redis/ca.crt -certfile /etc/redis/redis.crt -keyfile /etc/redis/redis.key</code>.
+The <code>-tls</code> and <code>?tls</code> methods can be used to disable and query TLS mode.
+The <a href="examples/ping-pong.tcl">ping-pong example</a> can be ran in TLS mode via
+<code>tclsh ping-pong.tcl --tls</code>.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -731,7 +756,7 @@ License.</p>
 <div id="footer">
 <div id="footer-text">
 Version 0.4.0<br/>
-Last updated 2024-05-20 13:33:57 UTC
+Last updated 2024-05-22 09:10:00 UTC
 </div>
 </div>
 </body>

@@ -24,7 +24,9 @@ proc run {use_tls id} {
 
     set r [retcl new -noconnect]
     if {$use_tls} {
-        $r +tls
+        $r +tls -cafile   /usr/local/etc/redis/ca.crt \
+                -certfile /usr/local/etc/redis/redis.crt \
+                -keyfile  /usr/local/etc/redis/redis.key
     }
     $r connect
     $r callback [lindex $::chans $id] [list pingpong $r $id]
@@ -37,13 +39,6 @@ proc run {use_tls id} {
 }
 
 set use_tls [expr {[lindex $::argv 0] eq {--tls}}]
-if {$use_tls} {
-    package require tls
-    tls::init -cafile   /usr/local/etc/redis/ca.crt \
-              -certfile /usr/local/etc/redis/redis.crt \
-              -keyfile  /usr/local/etc/redis/redis.key
-}
-
 run $use_tls 1
 after 1000
 run $use_tls 0

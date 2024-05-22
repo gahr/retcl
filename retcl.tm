@@ -101,9 +101,8 @@ oo::class create retcl {
     variable async
 
     ##
-    # Boolean to indicate whether the connection to the Redis server should be
-    # established using TLS (see +tls and -tls methods).
-    # This requires the tcltls extension available at
+    # This variable contains the arguments passed to the +tls method, or 0 if
+    # TLS is disabled. TLS requires the tcltls extension available at
     # https://core.tcl-lang.org/tcltls.
     variable tls
 
@@ -210,16 +209,16 @@ oo::class create retcl {
             set port $a_port
         }
 
-        if {$tls} {
+        if {$tls ne {0}} {
             if {[catch {package require tls} res]} {
                 my Error "Cannot load TLS extension: $res"
             }
-            set socket_cmd tls::socket
+            set socket_cmd [concat tls::socket $tls]
         } else {
-            set socket_cmd socket
+            set socket_cmd [list socket]
 
         }
-        if {[catch {$socket_cmd $host $port} res]} {
+        if {[catch {{*}$socket_cmd $host $port} res]} {
             my Error "Cannot connect: $res"
         }
 
@@ -299,9 +298,11 @@ oo::class create retcl {
     export ?async
 
     ##
-    # Turn on TLS connections.
-    method +tls {} {
-        set tls 1
+    # Turn on TLS connections. If args is specified, it will be passed to
+    # tls::socket on connection.
+    method +tls {{args 1}} {
+        set tls $args
+        return 1
     }
     export +tls
 
@@ -315,7 +316,7 @@ oo::class create retcl {
     ##
     # Query the current TLS connection mode.
     method ?tls {} {
-        set tls
+        expr {$tls ne {0}}
     }
     export ?tls
 
