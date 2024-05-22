@@ -227,7 +227,7 @@ In the default configuration, https://redis.io[Redis] requires a valid client
 certificate on connection, which requires specifying a few parameters, e.g., 
 `r +tls -cafile /etc/redis/ca.crt -certfile /etc/redis/redis.crt -keyfile /etc/redis/redis.key`.
 The `-tls` and `?tls` methods can be used to disable and query TLS mode.
-The link:/retcl/file?name=examples/ping-pong.tcl[ping-pong example] can be ran
+The link:/retcl/file?name=examples/ping-pong.tcl[ping-pong example] can be run
 in TLS mode via `tclsh ping-pong.tcl --tls`.
 
 == Encoding
