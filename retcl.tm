@@ -213,7 +213,7 @@ oo::class create retcl {
             if {[catch {package require tls} res]} {
                 my Error "Cannot load TLS extension: $res"
             }
-            set socket_cmd [concat tls::socket $tls]
+            set socket_cmd [concat tls::socket [expr {$tls eq {1} ? "" : $tls}]]
         } else {
             set socket_cmd [list socket]
 

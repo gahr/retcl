@@ -24,9 +24,7 @@ proc run {use_tls id} {
 
     set r [retcl new -noconnect]
     if {$use_tls} {
-        $r +tls -cafile   /usr/local/etc/redis/ca.crt \
-                -certfile /usr/local/etc/redis/redis.crt \
-                -keyfile  /usr/local/etc/redis/redis.key
+        $r +tls
     }
     $r connect
     $r callback [lindex $::chans $id] [list pingpong $r $id]
