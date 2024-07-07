@@ -5,7 +5,7 @@
 <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="generator" content="Asciidoctor 2.0.22"/>
+<meta name="generator" content="Asciidoctor 2.0.23"/>
 <meta name="author" content="Pietro Cerutti"/>
 <title>retcl(n)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"/>
@@ -485,10 +485,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><code>package require <strong>retcl</strong></code></p>
 </div>
 <div class="paragraph">
-<p><code><strong>retcl</strong> create <em>?objectName?</em> <em>?-noconnect?</em> <em>?host?</em> <em>?port?</em></code></p>
+<p><code><strong>retcl</strong> create <em>?objectName?</em> <em>?host?</em> <em>?port?</em></code></p>
 </div>
 <div class="paragraph">
-<p><code>set r [<strong>retcl</strong> new <em>?-noconnect?</em> <em>?host?</em> <em>?port?</em>]</code></p>
+<p><code><strong>retcl</strong> create <em>?objectName?</em> -noconnect</code></p>
+</div>
+<div class="paragraph">
+<p><code>set r [<strong>retcl</strong> new <em>?host?</em> <em>?port?</em>]</code></p>
+</div>
+<div class="paragraph">
+<p><code>set r [<strong>retcl</strong> new -noconnect]</code></p>
 </div>
 <div class="paragraph">
 <p><code><strong>$r</strong> connect <em>?host?</em> <em>?port?</em></code></p>
@@ -600,14 +606,16 @@ a live application.</p>
 <h3 id="_construction">Construction</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tcl" data-lang="tcl">set r [retcl new ?-noconnect? ?host? ?port?]
-retcl create r ?-noconnect? ?host? ?port?</code></pre>
+<pre class="highlight"><code class="language-tcl" data-lang="tcl">set r [retcl new ?host? ?port?]
+set r [retcl new -noconnect]
+retcl create r ?host? ?port?
+retcl create r -noconnect</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Create an instance <strong>r</strong> of <code>retcl</code>. By default, the client automatically
-connects to localhost on port 6379. If <code>-noconnect</code> is specified, the client is
-created in disconnected mode.</p>
+<p>Create an instance <strong>r</strong> of <code>retcl</code>. If no <code>host</code> or <code>port</code> is specified, the
+client automatically connects to localhost on port 6379. If <code>-noconnect</code> is
+specified, the client is created in disconnected mode.</p>
 </div>
 </div>
 <div class="sect2">
@@ -773,7 +781,7 @@ License.</p>
 <div id="footer">
 <div id="footer-text">
 Version 0.5.0<br/>
-Last updated 2024-05-22 13:51:37 UTC
+Last updated 2024-07-07 20:20:51 UTC
 </div>
 </div>
 </body>
