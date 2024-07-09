@@ -5,6 +5,7 @@
 3. update package version expectation in test/001-pkg-version.test
 4. rename the retcl-${VERSION}.tm symlink
 5. run `make docs` to update the generated HTML page in docs
-6. commit these changes with a commit message "Release: retcl-${VERSION}"
-7. tag this commit as ${VERSION} with a message of "retcl-${VERSION}"
-8. push both the commit and the tag, edit the release notes on github
+6. run `make test`
+7. commit these changes with a commit message "Release: retcl-${VERSION}"
+8. tag this commit as ${VERSION} with a message of "retcl-${VERSION}"
+9. push both the commit and the tag, edit the release notes on github
