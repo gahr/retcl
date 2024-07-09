@@ -3,7 +3,7 @@ ifdef::generate_manpage[]
 :author:        Pietro Cerutti
 :email:         gahr@gahr.ch
 :revdate:       October 24, 2021
-:revnumber:     0.5.0
+:revnumber:     0.6.0
 :package:       retcl
 :doctype:       manpage
 :manmanual:     RETCL
