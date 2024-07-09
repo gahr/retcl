@@ -120,10 +120,10 @@ endif::generate_manpage[]
 
 [source,tcl]
 ----
-set r [retcl new ?host? ?port? ?option ...?]
-set r [retcl new -noconnect ?option ...?]
-retcl create r ?host? ?port?
-retcl create r -noconnect
+set r [retcl new ?host port? ?option ...?]
+set r [retcl new ?-noconnect? ?option ...?]
+retcl create r ?host port? ?option ...?
+retcl create r ?-noconnect? ?option ...?
 ----
 
 Create an instance *r* of `retcl`. If no `host` or `port` is specified, the
