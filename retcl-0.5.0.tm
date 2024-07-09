@@ -167,13 +167,14 @@ oo::class create retcl {
         set reconnectEventId {}
         set activity 0
 
+        set optRegex {^[+-]}
         # gather all methods that can be used as options
-        set methods [lmap m [info object methods [self object] -all] {
-            if {![regexp {^[+-]} $m]} {
+        set methods [lsort [lmap m [info object methods [self object] -all] {
+            if {![regexp $optRegex $m]} {
                 continue
             }
             set m
-        }]
+        }]]
         
         # apply all options and re-gather non-option arguments
         set args [lmap a $args {
@@ -181,6 +182,8 @@ oo::class create retcl {
             if {$opt in $methods} {
                 my $opt {*}[lrange $a 1 end]
                 continue
+            } elseif {[regexp $optRegex $a] && $a ne {-noconnect}} {
+                my Error "bad option \"$opt\": must be any of -noconnect $methods"
             }
             set a
         }]

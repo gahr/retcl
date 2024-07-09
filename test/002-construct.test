@@ -33,9 +33,9 @@ tcltest::test construct-1.4 {wrong option} -constraints {
     set r [retcl new -foobar]
 } -returnCodes {
     error
-} -result {bad option "-foobar": must be -noconnect}
+} -result {bad option "-foobar": must be any of -noconnect +async +keepCache +tls -async -keepCache -tls}
 
-tcltest::test construct-1.4 {wrong # args} -constraints {
+tcltest::test construct-1.5 {wrong # args} -constraints {
     serverIsRunning
 } -body {
     set r [retcl new a b c d e]
@@ -43,7 +43,7 @@ tcltest::test construct-1.4 {wrong # args} -constraints {
     error
 } -result {wrong # args: must be "?host port?" or "-noconnect"}
 
-tcltest::test construct-1.5 {new syntax w/o host and port} -constraints {
+tcltest::test construct-1.6 {new syntax w/o host and port} -constraints {
     serverIsRunning
 } -body {
     retcl create r -async -keepCache
@@ -52,7 +52,7 @@ tcltest::test construct-1.5 {new syntax w/o host and port} -constraints {
     r destroy
 } -result {1 0 0 0}
 
-tcltest::test construct-1.5 {new syntax w/ host and port} -constraints {
+tcltest::test construct-1.7 {new syntax w/ host and port} -constraints {
     serverIsRunning
 } -body {
     retcl create r localhost 6379 -async -keepCache
@@ -61,7 +61,7 @@ tcltest::test construct-1.5 {new syntax w/ host and port} -constraints {
     r destroy
 } -result {1 0 0 0}
 
-tcltest::test construct-1.6 {new syntax w/ -noconnect} -constraints {
+tcltest::test construct-1.8 {new syntax w/ -noconnect} -constraints {
     serverIsRunning
 } -body {
     retcl create r -noconnect -async -keepCache {+tls -cafile /etc/redis/ca.crt -certfile /etc/redis/redis.crt -keyfile /etc/redis/redis.key}
@@ -69,3 +69,21 @@ tcltest::test construct-1.6 {new syntax w/ -noconnect} -constraints {
 } -cleanup {
     r destroy
 } -result {0 0 0 1}
+
+tcltest::test construct-1.9 {new syntax w/ -noconnect after options} -constraints {
+    serverIsRunning
+} -body {
+    retcl create r -async -keepCache -noconnect {+tls -cafile /etc/redis/ca.crt -certfile /etc/redis/redis.crt -keyfile /etc/redis/redis.key}
+    list [r connected ] [r ?async] [r ?keepCache] [r ?tls]
+} -cleanup {
+    r destroy
+} -result {0 0 0 1}
+
+tcltest::test construct-1.10 {new syntax w/ wrong options} -constraints {
+    serverIsRunning
+} -body {
+    retcl create r localhost 6379 -async -foobar
+    list [r connected ] [r ?async] [r ?keepCache] [r ?tls]
+} -returnCodes {
+    error
+} -result {bad option "-foobar": must be any of -noconnect +async +keepCache +tls -async -keepCache -tls}
