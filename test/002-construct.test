@@ -42,3 +42,30 @@ tcltest::test construct-1.4 {wrong # args} -constraints {
 } -returnCodes {
     error
 } -result {wrong # args: must be "?host port?" or "-noconnect"}
+
+tcltest::test construct-1.5 {new syntax w/o host and port} -constraints {
+    serverIsRunning
+} -body {
+    retcl create r -async -keepCache
+    list [r connected ] [r ?async] [r ?keepCache] [r ?tls]
+} -cleanup {
+    r destroy
+} -result {1 0 0 0}
+
+tcltest::test construct-1.5 {new syntax w/ host and port} -constraints {
+    serverIsRunning
+} -body {
+    retcl create r localhost 6379 -async -keepCache
+    list [r connected ] [r ?async] [r ?keepCache] [r ?tls]
+} -cleanup {
+    r destroy
+} -result {1 0 0 0}
+
+tcltest::test construct-1.6 {new syntax w/ -noconnect} -constraints {
+    serverIsRunning
+} -body {
+    retcl create r -noconnect -async -keepCache {+tls -cafile /etc/redis/ca.crt -certfile /etc/redis/redis.crt -keyfile /etc/redis/redis.key}
+    list [r connected ] [r ?async] [r ?keepCache] [r ?tls]
+} -cleanup {
+    r destroy
+} -result {0 0 0 1}

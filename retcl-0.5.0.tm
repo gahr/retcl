@@ -167,6 +167,24 @@ oo::class create retcl {
         set reconnectEventId {}
         set activity 0
 
+        # gather all methods that can be used as options
+        set methods [lmap m [info object methods [self object] -all] {
+            if {![regexp {^[+-]} $m]} {
+                continue
+            }
+            set m
+        }]
+        
+        # apply all options and re-gather non-option arguments
+        set args [lmap a $args {
+            set opt [lindex $a 0]
+            if {$opt in $methods} {
+                my $opt {*}[lrange $a 1 end]
+                continue
+            }
+            set a
+        }]
+
         switch [llength $args] {
             0 {
                 # connect to default host and port

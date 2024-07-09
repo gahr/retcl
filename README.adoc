@@ -18,9 +18,9 @@ Retcl - Redis client library for Tcl
 
 `package require *retcl*`
 
-`*retcl* create _?objectName?_ _?host?_ _?port?_`
+`*retcl* create _?objectName?_ _?host?_ _?port?_ _?option ...?_`
 
-`*retcl* create _?objectName?_ -noconnect`
+`*retcl* create _?objectName?_ -noconnect _?option ...?_`
 
 `set r [*retcl* new _?host?_ _?port?_]`
 
@@ -120,8 +120,8 @@ endif::generate_manpage[]
 
 [source,tcl]
 ----
-set r [retcl new ?host? ?port?]
-set r [retcl new -noconnect]
+set r [retcl new ?host? ?port? ?option ...?]
+set r [retcl new -noconnect ?option ...?]
 retcl create r ?host? ?port?
 retcl create r -noconnect
 ----
@@ -129,6 +129,14 @@ retcl create r -noconnect
 Create an instance *r* of `retcl`. If no `host` or `port` is specified, the
 client automatically connects to localhost on port 6379. If `-noconnect` is
 specified, the client is created in disconnected mode.
+Each additional `option` is a simple string or a list representing the
+invocation of a configuration method. Here are some examples.
+[source,tcl]
+----
+retcl create r localhost 6973 -async {+tls -cafile /path/to/ca.crt}
+retcl create r -keepCache
+retcl create r -noconnect -keepCache +async
+----
 
 === Connection / disconnection
 
