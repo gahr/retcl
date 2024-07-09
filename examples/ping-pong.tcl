@@ -20,13 +20,9 @@ proc pingpong {r id type pattern channel msg} {
     $r SUBSCRIBE [lindex $::chans $id]
 }
 
-proc run {use_tls id} {
+proc run {opts id} {
 
-    set r [retcl new -noconnect]
-    if {$use_tls} {
-        $r +tls
-    }
-    $r connect
+    set r [retcl new {*}$opts]
     $r callback [lindex $::chans $id] [list pingpong $r $id]
 
     if {$id == 0} {
@@ -36,9 +32,9 @@ proc run {use_tls id} {
     $r SUBSCRIBE [lindex $::chans $id]
 }
 
-set use_tls [expr {[lindex $::argv 0] eq {--tls}}]
-run $use_tls 1
+set opts [expr {[lindex $::argv 0] eq {--tls} ? {+tls} : {}}]
+run $opts 1
 after 1000
-run $use_tls 0
+run $opts 0
 
 vwait forever
