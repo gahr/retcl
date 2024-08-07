@@ -1,6 +1,6 @@
 # vim: ft=tcl ts=4 sw=4 expandtab:
 
-package require Tcl 8.6
+package require Tcl 8.6 9.0
 package require tcltest 2.3
 
 tcl::tm::path add [file join [file dirname [info script]] .. ]

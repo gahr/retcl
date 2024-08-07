@@ -25,7 +25,7 @@
 # SUCH DAMAGE.
 #
 
-package require Tcl 8.6
+package require Tcl 8.6 9.0
 package require TclOO
 
 package provide retcl 0.6.0
