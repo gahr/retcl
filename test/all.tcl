@@ -29,11 +29,11 @@ tcltest::configure {*}$argv -singleproc 1 -testdir [file dir [info script]] \
         }
 
         proc startServer {} {
-            exec doas service redis onestart
+            exec doas service $::env(REDIS) onestart
         }
 
         proc stopServer {} {
-            exec doas service redis onestop
+            exec doas service $::env(REDIS) onestop
         }
     }
 

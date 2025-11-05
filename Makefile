@@ -1,6 +1,7 @@
 # vim: set ts=4:
 
-TCLSH?=	tclsh8.7
+TCLSH?=	tclsh9.0
+REDIS?=	redis
 REPO=	fossil info | grep ^repository | awk '{print $$2}'
 
 all:
