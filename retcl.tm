@@ -295,6 +295,7 @@ oo::class create retcl {
         set sock {}
         after cancel $checkEventId
         after cancel $reconnectEventId
+        set resultsCache [dict create]
     }
 
     ##
@@ -485,7 +486,9 @@ oo::class create retcl {
         } on error msg {
             my Error $msg
         } finally {
-            my ReleasePipeline
+            if {[catch {my ReleasePipeline} err]} {
+                my Error $err
+            }
         }
     }
 
@@ -552,7 +555,9 @@ oo::class create retcl {
             dict set resultsCache $cmdId callback $callback
         }
 
-        my Send $args
+        if {[catch {my Send $args} err]} {
+            my Error $err
+        }
 
         if {$sendAsync || $callback ne {} || $cmdId eq {}} {
             # Asynchronous send, return the command identifier
@@ -592,7 +597,9 @@ oo::class create retcl {
             }
 
             lassign $result idx type data
-            my HandleResult $type $data
+            if {[catch {my HandleResult $type $data} err]} {
+                my Error $err
+            }
         }
 
         if {$idx != 0} {
@@ -753,7 +760,7 @@ oo::class create retcl {
         set cmdIds [my FindPendingRequest]
         if {$cmdIds eq {}} {
             # All requests already have a response, something went bad
-            my Error "No request found for response $body"
+            error "No request found for response $body"
         }
         set cmdId [lindex $cmdIds 0]
         set cb [dict get $resultsCache $cmdId callback]
@@ -771,7 +778,7 @@ oo::class create retcl {
     # Get a return type string by its byte.
     method TypeName {byte} {
         if {[catch {dict get $::retcl::typeNames $byte} name]} {
-            my Error "Invalid type byte: $byte"
+            error "Invalid type byte: $byte"
         }
         set name
     }
@@ -791,7 +798,7 @@ oo::class create retcl {
     # argument is a list of words composing the command.
     method Send {args} {
         if {[llength $args] > 1} {
-            my Error "Too many args: $args"
+            error "Too many args: $args"
         }
         foreach cmd $args {
             append pipeline "[my BuildResp {*}$cmd]\r\n"
@@ -906,15 +913,17 @@ oo::class create retcl {
     # Flush the output buffer
     method Flush {} {
         if {![my connected]} {
-            my Error {Disconnected}
+            error Disconnected
         }
-        if {[catch {puts -nonewline $sock $pipeline} err]} {
-            my Error $err
-        }
-        chan flush $sock
 
+        set buf $pipeline
         set isPipelined 0
         set pipeline [list]
+        if {[catch {puts -nonewline $sock $buf} err]} {
+            my disconnect
+            error $err
+        }
+        chan flush $sock
     }
 
     ##

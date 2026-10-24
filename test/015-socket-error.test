@@ -1,0 +1,21 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
+tcltest::loadTestedCommands
+
+tcltest::test socket-error-1.1 {disconnect on socket error} -setup {
+   set r [retcl new]
+} -body {
+    set v1 [catch {$r -sync set foo 👍} err]
+    set v2 [string match "error writing *" $err]
+    set v3 [$r connected]
+    list $v1 $v2 $v3
+} -result {1 1 0}
+
+tcltest::test socket-error-1.2 {cleanup state on socket error} -setup {
+   set r [retcl new]
+} -body {
+    catch {$r pipeline {$r set foo 👍}}
+    $r connect
+    $r -sync set foo bar
+    $r -sync get foo
+} -result bar
