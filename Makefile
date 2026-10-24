@@ -17,7 +17,7 @@ man: README.adoc
 
 .PHONY: test
 test:
-	${TCLSH} test/all.tcl
+	${TCLSH} test/all.tcl ${TESTFLAGS}
 
 clean:
 	rm -f retcl.n
