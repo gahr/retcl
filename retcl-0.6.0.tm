@@ -107,6 +107,16 @@ oo::class create retcl {
     variable tls
 
     ##
+    # Boolean to indicate whether data to be sent to Redis is checked for
+    # characters above 0xFF. The socket is binary, so non-binary strings will
+    # cause a write error and leave the socket in an inconsistent state,
+    # forcing us to close the connection.
+    # This flag forces a check and triggers an error earlier, before the data
+    # hits the socket, which might be more desirable than closing the
+    # connection.
+    variable binaryCheck
+
+    ##
     # An incremental integer to track requests / responses.
     variable cmdIdNumber
 
@@ -155,6 +165,7 @@ oo::class create retcl {
         set keepCache 1
         set async 1
         set tls 0
+        set binaryCheck 0
         set cmdIdNumber 0
         set host $::retcl::defaultHost
         set port $::retcl::defaultPort
@@ -364,6 +375,27 @@ oo::class create retcl {
     export ?keepCache
 
     ##
+    # Turn on binary checks.
+    method +binaryCheck {} {
+        set binaryCheck 1
+    }
+    export +binaryCheck
+
+    ##
+    # Turn off binary checks.
+    method -binaryCheck {} {
+        set binaryCheck 0
+    }
+    export -binaryCheck
+
+    ##
+    # Query the current binary check mode.
+    method ?binaryCheck {} {
+        set binaryCheck
+    }
+    export ?binaryCheck
+
+    ##
     # Setup and error callback or restore the default one ([error]). The
     # cmdPrefix is passed an additional argument containing the error message.
     method errorHandler {{cmdPrefix {}}} {
@@ -552,6 +584,10 @@ oo::class create retcl {
             return
         }
 
+        if {[catch {my Send $args} err]} {
+            my Error $err
+        }
+
         if {[string tolower [lindex $args 0]] in $::retcl::pubSubCommands} {
             # These messages are part of the Pub/Sub protocol; we don't expect
             # a response.
@@ -560,10 +596,6 @@ oo::class create retcl {
             set cmdId "rds:[incr cmdIdNumber]"
             dict set resultsCache $cmdId status 0
             dict set resultsCache $cmdId callback $callback
-        }
-
-        if {[catch {my Send $args} err]} {
-            my Error $err
         }
 
         if {$sendAsync || $callback ne {} || $cmdId eq {}} {
@@ -795,6 +827,9 @@ oo::class create retcl {
     method BuildResp {args} {
         set msg "*[llength $args]\r\n"
         foreach word $args {
+            if {$binaryCheck && [regexp {[^\x00-\xff]} $word]} {
+                error "non-binary data in argument: $word"
+            }
             append msg "\$[string length $word]\r\n$word\r\n"
         }
         set msg
