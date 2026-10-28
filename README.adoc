@@ -263,7 +263,7 @@ disconnection from the server. The `?binaryCheck` method can be used to query
 the current settings. For performance reasons, by default the binary check is
 disabled.
 See the link:/retcl/file?ln=5&ci=f90952f00ba2ab6d&name=test%2F014-utf8.test[utf8-1.1]
-and link:/retcl/?retcl/file?name=test%2F015-binary-data.test&checkin=7728830292c20ca6[binary-data]
+and link:/retcl/file?name=test%2F015-binary-data.test&checkin=7728830292c20ca6[binary-data]
 tests for an example and tickets link:/retcl/tktview/70c08b5b5d[70c08b5b5dfor] 
 and link:/retcl/tktview/7cc4bc44164376f9[7cc4bc44164376f9] for details.
 
