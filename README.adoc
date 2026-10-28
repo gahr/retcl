@@ -2,7 +2,7 @@ ifdef::generate_manpage[]
 = retcl(n)
 :author:        Pietro Cerutti
 :email:         gahr@gahr.ch
-:revdate:       October 24, 2021
+:revdate:       October 28, 2026
 :revnumber:     0.6.0
 :package:       retcl
 :doctype:       manpage
@@ -262,7 +262,7 @@ Project page: https://code.ptrcrt.ch/retcl/
 
 == Copying
 
-Copyright (C) 2014-2018 {author}.
+Copyright (C) 2014-2026 {author}.
 Free use of this software is granted under the terms of the BSD-2-Clause
 License.
 endif::generate_manpage[]
