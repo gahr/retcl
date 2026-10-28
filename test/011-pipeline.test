@@ -40,3 +40,24 @@ tcltest::test pipeline-1.2 {pipeline not dismantled on error} -constraints {
 } -cleanup {
     $r destroy
 } -result {failure!ok!}
+
+tcltest::test pipeline-1.3 {pipeline needs async I} -constraints {
+    serverIsRunning
+} -setup {
+    retcl create r
+} -body {
+    r -async
+    catch {r pipeline { r set foo bar }}
+} -cleanup {
+    r destroy
+} -result 1
+
+tcltest::test pipeline-1.4 {pipeline needs async II} -constraints {
+    serverIsRunning
+} -setup {
+    retcl create r
+} -body {
+    catch {r pipeline { r -sync set foo bar }}
+} -cleanup {
+    r destroy
+} -result 1

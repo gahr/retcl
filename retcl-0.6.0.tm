@@ -480,6 +480,10 @@ oo::class create retcl {
     # Execute all Redis commands inside a script within a single pipeline.
     method pipeline {script} {
 
+        if {!$async} {
+            my Error "pipelining is only supported in async mode"
+        }
+
         my LockPipeline
         try {
             uplevel [list eval $script]
@@ -530,6 +534,9 @@ oo::class create retcl {
 
         switch [lindex $args 0] {
             {-sync} {
+                if {$isPipelined} {
+                    my Error "sync mode is not supported in a pipeline"
+                }
                 # Send synchronously and return the result, when available
                 set sendAsync 0
                 set args [lrange $args 1 end]
