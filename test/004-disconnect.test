@@ -10,3 +10,21 @@ tcltest::test disconnect-1.1 {disconnect} -constraints {
 } -cleanup {
     $r destroy
 } -result {0}
+
+tcltest::test disconnect-1.2 {reconnect maintains cached results} -constraints {
+    serverIsRunning
+} -setup {
+    set r [retcl new]
+} -body {
+    set r1 [$r set foo bar]
+    set r2 [$r get foo]
+    set r3 [$r result $r2]
+    puts "before disconnect"
+    $r disconnect
+    puts "after disconnect"
+    $r connect
+    set r4 [$r result $r2]
+    list $r3 $r4
+} -cleanup {
+    $r destroy
+} -result {bar bar}

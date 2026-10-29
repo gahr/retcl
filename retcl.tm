@@ -43,6 +43,10 @@ namespace eval ::retcl {
     variable defaultPort 6379
 
     ##
+    # Prefix for command ids
+    variable cmdIdPrefix "rds:"
+
+    ##
     # Mapping of RESP data types to symbolic names.
     # See http://redis.io/topics/protocol.
     variable typeNames {
@@ -199,7 +203,7 @@ oo::class create retcl {
             set a
         }]
 
-        switch [llength $args] {
+        switch -- [llength $args] {
             0 {
                 # connect to default host and port
                 my connect
@@ -306,7 +310,7 @@ oo::class create retcl {
         set sock {}
         after cancel $checkEventId
         after cancel $reconnectEventId
-        set resultsCache [dict create]
+        my clearResult pending
     }
 
     ##
@@ -412,7 +416,7 @@ oo::class create retcl {
     # string if -async is given.
     method result {args} {
 
-        switch [llength $args] {
+        switch -- [llength $args] {
             1 {
                 set asyncArg 0
                 set cmdId $args
@@ -494,16 +498,23 @@ oo::class create retcl {
     ##
     # Clear results from the cache.
     method clearResult {{clearCmdId {}}} {
-
-        if {$clearCmdId eq {}} {
-            set resultsCache [dict filter $resultsCache script {cmdId _} {
-                expr {![dict get $resultsCache $cmdId status]}
-            }]
-        } else {
-            set resultsCache [dict filter $resultsCache script {cmdId _} {
-                expr {$clearCmdId ne $cmdId ||
-                      ![dict get $resultsCache $cmdId status]}
-            }]
+        switch -glob -- $clearCmdId {
+            {} {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    expr {![dict get $resultsCache $cmdId status]}
+                }]
+            }
+            "$::retc::cmdIdPrefix*" {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    expr {$clearCmdId ne $cmdId ||
+                          ![dict get $resultsCache $cmdId status]}
+                }]
+            }
+            pending {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    dict get $resultsCache $cmdId status
+                }]
+            }
         }
         return {}
     }
@@ -593,7 +604,7 @@ oo::class create retcl {
             # a response.
             set cmdId {}
         } else {
-            set cmdId "rds:[incr cmdIdNumber]"
+            set cmdId "$::retcl::cmdIdPrefix[incr cmdIdNumber]"
             dict set resultsCache $cmdId status 0
             dict set resultsCache $cmdId callback $callback
         }
@@ -867,7 +878,7 @@ oo::class create retcl {
             set respName [my TypeName $respCode]
             set respData [string range $line 1 end]
 
-            switch $respCode {
+            switch -- $respCode {
                 + -
                 - -
                 : {
