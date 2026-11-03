@@ -839,7 +839,7 @@ oo::class create retcl {
         set msg "*[llength $args]\r\n"
         foreach word $args {
             if {$binaryCheck && [regexp {[^\x00-\xff]} $word]} {
-                error "non-binary data in argument: $word"
+                error "non-binary data detected"
             }
             append msg "\$[string length $word]\r\n$word\r\n"
         }
