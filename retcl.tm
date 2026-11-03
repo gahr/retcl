@@ -504,15 +504,15 @@ oo::class create retcl {
                     expr {![dict get $resultsCache $cmdId status]}
                 }]
             }
-            "$::retc::cmdIdPrefix*" {
-                set resultsCache [dict filter $resultsCache script {cmdId _} {
-                    expr {$clearCmdId ne $cmdId ||
-                          ![dict get $resultsCache $cmdId status]}
-                }]
-            }
             pending {
                 set resultsCache [dict filter $resultsCache script {cmdId _} {
                     dict get $resultsCache $cmdId status
+                }]
+            }
+            default {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    expr {$clearCmdId ne $cmdId ||
+                          ![dict get $resultsCache $cmdId status]}
                 }]
             }
         }
