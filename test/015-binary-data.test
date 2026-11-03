@@ -2,7 +2,13 @@
 
 tcltest::loadTestedCommands
 
-tcltest::test binary-data-1.1 {disconnect on socket error} -setup {
+# Tcl 8.6 silently truncates characters above 0xFF on a binary channel
+# instead of raising an error, so there is no socket error to recover from.
+tcltest::testConstraint tcl9 [package vsatisfies [info tclversion] 9]                                                                                                                
+
+tcltest::test binary-data-1.1 {disconnect on socket error} -constraints {
+    tcl9
+} -setup {
    set r [retcl new]
 } -body {
     set v1 [catch {$r -sync set foo 👍} err]
@@ -13,7 +19,9 @@ tcltest::test binary-data-1.1 {disconnect on socket error} -setup {
     $r destroy
 } -result {1 1 0}
 
-tcltest::test binary-data-1.2 {cleanup state on socket error} -setup {
+tcltest::test binary-data-1.2 {cleanup state on socket error} -constraints {
+    tcl9
+} -setup {
    set r [retcl new]
 } -body {
     catch {$r pipeline {$r set foo 👍}}
