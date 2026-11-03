@@ -33,7 +33,7 @@ tcltest::test construct-1.4 {wrong option} -constraints {
     set r [retcl new -foobar]
 } -returnCodes {
     error
-} -result {bad option "-foobar": must be any of -noconnect +async +keepCache +tls -async -keepCache -tls}
+} -result {bad option "-foobar": must be any of -noconnect +async +binaryCheck +keepCache +tls -async -binaryCheck -keepCache -tls}
 
 tcltest::test construct-1.5 {wrong # args} -constraints {
     serverIsRunning
@@ -86,4 +86,4 @@ tcltest::test construct-1.10 {new syntax w/ wrong options} -constraints {
     list [r connected ] [r ?async] [r ?keepCache] [r ?tls]
 } -returnCodes {
     error
-} -result {bad option "-foobar": must be any of -noconnect +async +keepCache +tls -async -keepCache -tls}
+} -result {bad option "-foobar": must be any of -noconnect +async +binaryCheck +keepCache +tls -async -binaryCheck -keepCache -tls}

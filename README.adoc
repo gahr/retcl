@@ -62,6 +62,12 @@ Retcl - Redis client library for Tcl
 
 `*$r* ?keepCache`
 
+`*$r* +binaryCheck`
+
+`*$r* -binaryCheck`
+
+`*$r* ?binaryCheck`
+
 `*$r* errorHandler _?cmdPrefix?_`
 
 `*$r* pipeline _script_`
@@ -248,11 +254,18 @@ in TLS mode via `tclsh ping-pong.tcl --tls`.
 
 As per the https://redis.io/docs/latest/develop/reference/protocol-spec/#resp-protocol-description[Redis Serialization Protocol (RESP)], 
 commands are sent over the wire as arrays of bulk strings. Bulk strings contain
-binary data, so all strings need to be converted to byte streams with values in
-the range 0-255. Unicode strings need to be encoded in utf-8.
+binary data, so all strings need to be converted to byte streams with
+characters in the range 0-255. Unicode strings need to be encoded in utf-8.
+The `+binaryCheck` method instructs Retcl to raise an error if a non-binary
+string is passed into the library. The `-binaryCheck` turns the check off -
+non-binary strings will then cause a write error on the socket and a
+disconnection from the server. The `?binaryCheck` method can be used to query
+the current settings. For performance reasons, by default the binary check is
+disabled.
 See the link:/retcl/file?ln=5&ci=f90952f00ba2ab6d&name=test%2F014-utf8.test[utf8-1.1]
-test for an example and link:/retcl/tktview/70c08b5b5d[ticket 70c08b5b5dfor]
-for details.
+and link:/retcl/file?name=test%2F015-binary-data.test&checkin=7728830292c20ca6[binary-data]
+tests for an example and tickets link:/retcl/tktview/70c08b5b5d[70c08b5b5dfor] 
+and link:/retcl/tktview/7cc4bc44164376f9[7cc4bc44164376f9] for details.
 
 ifdef::generate_manpage[]
 == Resources

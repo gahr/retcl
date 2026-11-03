@@ -551,6 +551,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><code><strong>$r</strong> ?keepCache</code></p>
 </div>
 <div class="paragraph">
+<p><code><strong>$r</strong> +binaryCheck</code></p>
+</div>
+<div class="paragraph">
+<p><code><strong>$r</strong> -binaryCheck</code></p>
+</div>
+<div class="paragraph">
+<p><code><strong>$r</strong> ?binaryCheck</code></p>
+</div>
+<div class="paragraph">
 <p><code><strong>$r</strong> errorHandler <em>?cmdPrefix?</em></code></p>
 </div>
 <div class="paragraph">
@@ -760,11 +769,18 @@ in TLS mode via <code>tclsh ping-pong.tcl --tls</code>.</p>
 <div class="paragraph">
 <p>As per the <a href="https://redis.io/docs/latest/develop/reference/protocol-spec/#resp-protocol-description">Redis Serialization Protocol (RESP)</a>,
 commands are sent over the wire as arrays of bulk strings. Bulk strings contain
-binary data, so all strings need to be converted to byte streams with values in
-the range 0-255. Unicode strings need to be encoded in utf-8.
+binary data, so all strings need to be converted to byte streams with
+characters in the range 0-255. Unicode strings need to be encoded in utf-8.
+The <code>+binaryCheck</code> method instructs Retcl to raise an error if a non-binary
+string is passed into the library. The <code>-binaryCheck</code> turns the check off -
+non-binary strings will then cause a write error on the socket and a
+disconnection from the server. The <code>?binaryCheck</code> method can be used to query
+the current settings. For performance reasons, by default the binary check is
+disabled.
 See the <a href="/retcl/file?ln=5&amp;ci=f90952f00ba2ab6d&amp;name=test%2F014-utf8.test">utf8-1.1</a>
-test for an example and <a href="/retcl/tktview/70c08b5b5d">ticket 70c08b5b5dfor</a>
-for details.</p>
+and <a href="/retcl/file?name=test%2F015-binary-data.test&amp;checkin=7728830292c20ca6">binary-data</a>
+tests for an example and tickets <a href="/retcl/tktview/70c08b5b5d">70c08b5b5dfor</a>
+and <a href="/retcl/tktview/7cc4bc44164376f9">7cc4bc44164376f9</a> for details.</p>
 </div>
 </div>
 </div>
@@ -790,7 +806,7 @@ License.</p>
 <div id="footer">
 <div id="footer-text">
 Version 0.6.0<br/>
-Last updated 2026-10-28 21:54:51 UTC
+Last updated 2026-10-29 13:42:34 UTC
 </div>
 </div>
 </body>

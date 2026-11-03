@@ -1,0 +1,48 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
+tcltest::loadTestedCommands
+
+# Tcl 8.6 silently truncates characters above 0xFF on a binary channel
+# instead of raising an error, so there is no socket error to recover from.
+tcltest::testConstraint tcl9 [package vsatisfies [info tclversion] 9]                                                                                                                
+
+tcltest::test binary-data-1.1 {disconnect on socket error} -constraints {
+    tcl9
+} -setup {
+   set r [retcl new]
+} -body {
+    set v1 [catch {$r -sync set foo 👍} err]
+    set v2 [string match "error writing *" $err]
+    set v3 [$r connected]
+    list $v1 $v2 $v3
+} -cleanup {
+    $r destroy
+} -result {1 1 0}
+
+tcltest::test binary-data-1.2 {cleanup state on socket error} -constraints {
+    tcl9
+} -setup {
+   set r [retcl new]
+} -body {
+    catch {$r pipeline {$r set foo 👍}}
+    $r connect
+    $r -sync set foo bar
+    $r -sync get foo
+} -cleanup {
+    $r destroy
+} -result bar
+
+tcltest::test binary-data-1.3 {check for binary data} -setup {
+   set r [retcl new]
+   $r +binaryCheck
+} -body {
+    set v1 [catch {$r -sync set foo 👍} err]
+    set v2 [string match "non-binary data*" $err]
+    set v3 [$r connected]
+    set r1 [$r set foo bar]
+    set r2 [$r get foo]
+    set v4 [$r result $r2]
+    list $v1 $v2 $v3 $v4
+} -cleanup {
+    $r destroy
+} -result {1 1 1 bar}

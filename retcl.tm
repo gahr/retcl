@@ -43,6 +43,10 @@ namespace eval ::retcl {
     variable defaultPort 6379
 
     ##
+    # Prefix for command ids
+    variable cmdIdPrefix "rds:"
+
+    ##
     # Mapping of RESP data types to symbolic names.
     # See http://redis.io/topics/protocol.
     variable typeNames {
@@ -107,6 +111,16 @@ oo::class create retcl {
     variable tls
 
     ##
+    # Boolean to indicate whether data to be sent to Redis is checked for
+    # characters above 0xFF. The socket is binary, so non-binary strings will
+    # cause a write error and leave the socket in an inconsistent state,
+    # forcing us to close the connection.
+    # This flag forces a check and triggers an error earlier, before the data
+    # hits the socket, which might be more desirable than closing the
+    # connection.
+    variable binaryCheck
+
+    ##
     # An incremental integer to track requests / responses.
     variable cmdIdNumber
 
@@ -155,6 +169,7 @@ oo::class create retcl {
         set keepCache 1
         set async 1
         set tls 0
+        set binaryCheck 0
         set cmdIdNumber 0
         set host $::retcl::defaultHost
         set port $::retcl::defaultPort
@@ -188,7 +203,7 @@ oo::class create retcl {
             set a
         }]
 
-        switch [llength $args] {
+        switch -- [llength $args] {
             0 {
                 # connect to default host and port
                 my connect
@@ -295,6 +310,7 @@ oo::class create retcl {
         set sock {}
         after cancel $checkEventId
         after cancel $reconnectEventId
+        my clearResult pending
     }
 
     ##
@@ -363,6 +379,27 @@ oo::class create retcl {
     export ?keepCache
 
     ##
+    # Turn on binary checks.
+    method +binaryCheck {} {
+        set binaryCheck 1
+    }
+    export +binaryCheck
+
+    ##
+    # Turn off binary checks.
+    method -binaryCheck {} {
+        set binaryCheck 0
+    }
+    export -binaryCheck
+
+    ##
+    # Query the current binary check mode.
+    method ?binaryCheck {} {
+        set binaryCheck
+    }
+    export ?binaryCheck
+
+    ##
     # Setup and error callback or restore the default one ([error]). The
     # cmdPrefix is passed an additional argument containing the error message.
     method errorHandler {{cmdPrefix {}}} {
@@ -379,7 +416,7 @@ oo::class create retcl {
     # string if -async is given.
     method result {args} {
 
-        switch [llength $args] {
+        switch -- [llength $args] {
             1 {
                 set asyncArg 0
                 set cmdId $args
@@ -461,16 +498,23 @@ oo::class create retcl {
     ##
     # Clear results from the cache.
     method clearResult {{clearCmdId {}}} {
-
-        if {$clearCmdId eq {}} {
-            set resultsCache [dict filter $resultsCache script {cmdId _} {
-                expr {![dict get $resultsCache $cmdId status]}
-            }]
-        } else {
-            set resultsCache [dict filter $resultsCache script {cmdId _} {
-                expr {$clearCmdId ne $cmdId ||
-                      ![dict get $resultsCache $cmdId status]}
-            }]
+        switch -glob -- $clearCmdId {
+            {} {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    expr {![dict get $resultsCache $cmdId status]}
+                }]
+            }
+            pending {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    dict get $resultsCache $cmdId status
+                }]
+            }
+            default {
+                set resultsCache [dict filter $resultsCache script {cmdId _} {
+                    expr {$clearCmdId ne $cmdId ||
+                          ![dict get $resultsCache $cmdId status]}
+                }]
+            }
         }
         return {}
     }
@@ -489,7 +533,9 @@ oo::class create retcl {
         } on error msg {
             my Error $msg
         } finally {
-            my ReleasePipeline
+            if {[catch {my ReleasePipeline} err]} {
+                my Error $err
+            }
         }
     }
 
@@ -549,17 +595,19 @@ oo::class create retcl {
             return
         }
 
+        if {[catch {my Send $args} err]} {
+            my Error $err
+        }
+
         if {[string tolower [lindex $args 0]] in $::retcl::pubSubCommands} {
             # These messages are part of the Pub/Sub protocol; we don't expect
             # a response.
             set cmdId {}
         } else {
-            set cmdId "rds:[incr cmdIdNumber]"
+            set cmdId "$::retcl::cmdIdPrefix[incr cmdIdNumber]"
             dict set resultsCache $cmdId status 0
             dict set resultsCache $cmdId callback $callback
         }
-
-        my Send $args
 
         if {$sendAsync || $callback ne {} || $cmdId eq {}} {
             # Asynchronous send, return the command identifier
@@ -599,7 +647,9 @@ oo::class create retcl {
             }
 
             lassign $result idx type data
-            my HandleResult $type $data
+            if {[catch {my HandleResult $type $data} err]} {
+                my Error $err
+            }
         }
 
         if {$idx != 0} {
@@ -760,7 +810,7 @@ oo::class create retcl {
         set cmdIds [my FindPendingRequest]
         if {$cmdIds eq {}} {
             # All requests already have a response, something went bad
-            my Error "No request found for response $body"
+            error "No request found for response $body"
         }
         set cmdId [lindex $cmdIds 0]
         set cb [dict get $resultsCache $cmdId callback]
@@ -778,7 +828,7 @@ oo::class create retcl {
     # Get a return type string by its byte.
     method TypeName {byte} {
         if {[catch {dict get $::retcl::typeNames $byte} name]} {
-            my Error "Invalid type byte: $byte"
+            error "Invalid type byte: $byte"
         }
         set name
     }
@@ -788,6 +838,9 @@ oo::class create retcl {
     method BuildResp {args} {
         set msg "*[llength $args]\r\n"
         foreach word $args {
+            if {$binaryCheck && [regexp {[^\x00-\xff]} $word]} {
+                error "non-binary data detected"
+            }
             append msg "\$[string length $word]\r\n$word\r\n"
         }
         set msg
@@ -798,7 +851,7 @@ oo::class create retcl {
     # argument is a list of words composing the command.
     method Send {args} {
         if {[llength $args] > 1} {
-            my Error "Too many args: $args"
+            error "Too many args: $args"
         }
         foreach cmd $args {
             append pipeline "[my BuildResp {*}$cmd]\r\n"
@@ -825,7 +878,7 @@ oo::class create retcl {
             set respName [my TypeName $respCode]
             set respData [string range $line 1 end]
 
-            switch $respCode {
+            switch -- $respCode {
                 + -
                 - -
                 : {
@@ -913,15 +966,17 @@ oo::class create retcl {
     # Flush the output buffer
     method Flush {} {
         if {![my connected]} {
-            my Error {Disconnected}
+            error Disconnected
         }
-        if {[catch {puts -nonewline $sock $pipeline} err]} {
-            my Error $err
-        }
-        chan flush $sock
 
+        set buf $pipeline
         set isPipelined 0
         set pipeline [list]
+        if {[catch {puts -nonewline $sock $buf} err]} {
+            my disconnect
+            error $err
+        }
+        chan flush $sock
     }
 
     ##
