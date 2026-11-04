@@ -17,5 +17,6 @@ tcltest::test callback-1.1 {use callback to retrieve result} -constraints {
     vwait res
     set res
 } -cleanup {
+    $r flushall
     $r destroy
 } -result {rds:2 BulkString 42}

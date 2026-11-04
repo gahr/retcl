@@ -22,6 +22,7 @@ tcltest::test pipeline-1.1 {simple pipeline} -constraints {
     runEvents
     $r allResults
 } -cleanup {
+    $r flushall
     $r destroy
 } -result {rds:1 OK rds:1:type SimpleString rds:2 23 rds:2:type BulkString rds:3 OK rds:3:type SimpleString rds:4 25 rds:4:type BulkString rds:5 OK rds:5:type SimpleString rds:6 27 rds:6:type BulkString}
 

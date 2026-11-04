@@ -20,5 +20,6 @@ tcltest::test bigchunk-1.1 {read / write a big chunk of data} -constraints {
     set random [$r GET random]
     list [string length $data] [string length $random] [string compare $data $random]
 } -cleanup {
+    $r flushall
     $r destroy
 } -result [list [make15mb] [make15mb] 0]

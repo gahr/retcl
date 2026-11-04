@@ -11,7 +11,7 @@ tcltest::test resultType-1.1 {set is simple string} -constraints {
     runEvents
     $r resultType $res
 } -cleanup {
-    $r del 12
+    $r del a
     $r destroy
 } -result {SimpleString}
 
@@ -24,6 +24,6 @@ tcltest::test resultType-1.2 {set with two params is an error} -constraints {
     runEvents
     $r resultType $res
 } -cleanup {
-    $r del 12
+    $r del a
     $r destroy
 } -result {Error}

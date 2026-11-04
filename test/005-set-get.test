@@ -8,6 +8,7 @@ tcltest::test set-1.1 {set async} -constraints {
     set cmdId [$r SET key1 value1]
     $r result $cmdId
 } -cleanup {
+    $r flushall
     $r destroy
 } -result OK
 
@@ -18,6 +19,7 @@ tcltest::test set-1.2 {set sync} -constraints {
 } -body {
     $r -sync SET key2 value2
 } -cleanup {
+    $r flushall
     $r destroy
 } -result OK
 
@@ -25,10 +27,12 @@ tcltest::test get-1.1 {get async} -constraints {
     serverIsRunning
 } -setup {
     set r [retcl new]
+    $r SET key1 value1
 } -body {
     set cmdId [$r GET key1]
     $r result $cmdId
 } -cleanup {
+    $r flushall
     $r destroy
 } -result value1
 
@@ -36,9 +40,11 @@ tcltest::test get-1.2 {get sync} -constraints {
     serverIsRunning
 } -setup {
     set r [retcl new]
+    $r SET key2 value2
 } -body {
     $r -sync GET key2
 } -cleanup {
+    $r flushall
     $r destroy
 } -result value2
 
@@ -46,10 +52,13 @@ tcltest::test get-1.3 {get disconnect before} -constraints {
     serverIsRunning
 } -setup {
     set r [retcl new]
+    $r SET key2 value2
 } -body {
     $r disconnect
     $r -sync GET key2
 } -cleanup {
+    $r connect
+    $r flushall
     $r destroy
 } -returnCodes {
     1
@@ -59,6 +68,7 @@ tcltest::test get-1.4 {get disconnect after} -constraints {
     serverIsRunning
 } -setup {
     set r [retcl new]
+    $r SET key2 value2
 } -body {
     $r client pause 50
     after 10 {
@@ -66,6 +76,8 @@ tcltest::test get-1.4 {get disconnect after} -constraints {
     }
     $r -sync GET key2
 } -cleanup {
+    $r connect
+    $r flushall
     $r destroy
 } -returnCodes {
     1
