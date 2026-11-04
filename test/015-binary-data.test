@@ -4,14 +4,17 @@ tcltest::loadTestedCommands
 
 # Tcl 8.6 silently truncates characters above 0xFF on a binary channel
 # instead of raising an error, so there is no socket error to recover from.
-tcltest::testConstraint tcl9 [package vsatisfies [info tclversion] 9]                                                                                                                
+tcltest::testConstraint tcl9 [package vsatisfies [info tclversion] 9]
+tcltest::testConstraint tcl8 [package vsatisfies [info tclversion] 8]
+
+set thumb 👍
 
 tcltest::test binary-data-1.1 {disconnect on socket error} -constraints {
     tcl9
 } -setup {
    set r [retcl new]
 } -body {
-    set v1 [catch {$r -sync set foo 👍} err]
+    set v1 [catch {$r -sync set foo $thumb} err]
     set v2 [string match "error writing *" $err]
     set v3 [$r connected]
     list $v1 $v2 $v3
@@ -24,7 +27,7 @@ tcltest::test binary-data-1.2 {cleanup state on socket error} -constraints {
 } -setup {
    set r [retcl new]
 } -body {
-    catch {$r pipeline {$r set foo 👍}}
+    catch {$r pipeline {$r set foo $thumb}}
     $r connect
     $r -sync set foo bar
     $r -sync get foo
@@ -36,7 +39,7 @@ tcltest::test binary-data-1.3 {check for binary data} -setup {
    set r [retcl new]
    $r +binaryCheck
 } -body {
-    set v1 [catch {$r -sync set foo 👍} err]
+    set v1 [catch {$r -sync set foo $thumb} err]
     set v2 [string match "non-binary data*" $err]
     set v3 [$r connected]
     set r1 [$r set foo bar]
@@ -46,3 +49,15 @@ tcltest::test binary-data-1.3 {check for binary data} -setup {
 } -cleanup {
     $r destroy
 } -result {1 1 1 bar}
+
+tcltest::test binary-data-1.4 {cannot roundtrip on Tcl 8} -constraints {
+    tcl8
+} -setup {
+   set r [retcl new]
+} -body {
+    $r -sync set foo $thumb
+    set back [$r -sync get foo]
+    expr {$back eq $thumb}
+} -cleanup {
+    $r destroy
+} -result 0
