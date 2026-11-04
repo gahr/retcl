@@ -965,13 +965,18 @@ oo::class create retcl {
     ##
     # Flush the output buffer
     method Flush {} {
-        if {![my connected]} {
-            error Disconnected
-        }
-
         set buf $pipeline
         set isPipelined 0
         set pipeline [list]
+
+        if {![my connected]} {
+            # nothing can answer the commands still waiting for a result:
+            # they were queued while disconnected and are dropped with the
+            # buffer
+            my clearResult pending
+            error Disconnected
+        }
+
         if {[catch {puts -nonewline $sock $buf} err]} {
             my disconnect
             error $err
