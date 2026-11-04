@@ -8,8 +8,8 @@ package require retcl
 
 proc pre {} {
     retcl create r
-    if {[expr {[r -sync DBSIZE] != 0}]} {
-        error "Refusing to run tests on a non-empty database."
+    if {[regexp {db[0-9]+:} [r -sync INFO keyspace]]} {
+        error "Refusing to run tests on a non-empty server."
     }
     r destroy
 }
