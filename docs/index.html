@@ -442,8 +442,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="details">
 <span id="author" class="author">Pietro Cerutti</span><br/>
 <span id="email" class="email"><a href="mailto:gahr@gahr.ch">gahr@gahr.ch</a></span><br/>
-<span id="revnumber">version 0.6.0,</span>
-<span id="revdate">October 28, 2026</span>
+<span id="revnumber">version 0.7.0,</span>
+<span id="revdate">November 4, 2026</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -772,11 +772,18 @@ commands are sent over the wire as arrays of bulk strings. Bulk strings contain
 binary data, so all strings need to be converted to byte streams with
 characters in the range 0-255. Unicode strings need to be encoded in utf-8.
 The <code>+binaryCheck</code> method instructs Retcl to raise an error if a non-binary
-string is passed into the library. The <code>-binaryCheck</code> turns the check off -
-non-binary strings will then cause a write error on the socket and a
-disconnection from the server. The <code>?binaryCheck</code> method can be used to query
-the current settings. For performance reasons, by default the binary check is
-disabled.
+string is passed into the library. The <code>-binaryCheck</code> turns the check off.
+The <code>?binaryCheck</code> method can be used to query the current settings.
+For performance reasons, by default the binary check is disabled.</p>
+</div>
+<div class="paragraph">
+<p>When the check is disabled, the behavior is dependent on the version of Tcl
+used.
+On Tcl 9.x, non-binary strings will cause a write error on the socket and a
+disconnection from the server.
+On Tcl 8.6, such detection is not possible: astral characters are represented
+as UTF-16 surrogate pairs, and only the lowest 8-bits are sent over the wire,
+thus making the roundtrip lossy.
 See the <a href="/retcl/file?ln=5&amp;ci=f90952f00ba2ab6d&amp;name=test%2F014-utf8.test">utf8-1.1</a>
 and <a href="/retcl/file?name=test%2F015-binary-data.test&amp;checkin=7728830292c20ca6">binary-data</a>
 tests for an example and tickets <a href="/retcl/tktview/70c08b5b5d">70c08b5b5dfor</a>
@@ -805,8 +812,8 @@ License.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.6.0<br/>
-Last updated 2026-10-29 13:42:34 UTC
+Version 0.7.0<br/>
+Last updated 2026-11-04 08:12:02 UTC
 </div>
 </div>
 </body>
