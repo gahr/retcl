@@ -2,8 +2,8 @@ ifdef::generate_manpage[]
 = retcl(n)
 :author:        Pietro Cerutti
 :email:         gahr@gahr.ch
-:revdate:       November 4, 2026
-:revnumber:     0.7.0
+:revdate:       November 5, 2026
+:revnumber:     0.7.1
 :package:       retcl
 :doctype:       manpage
 :manmanual:     RETCL
