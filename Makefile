@@ -31,6 +31,6 @@ git:
 	fossil export --git --rename-trunk master --repository `${REPO}` | \
 	git fast-import && git reset --hard HEAD && \
 	git remote add origin git@github.com:gahr/retcl.git && \
-	git push -f origin master && \
+	git push -f origin master --tags && \
 	cd .. && rm -rf git-import
 
