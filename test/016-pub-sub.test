@@ -1,0 +1,26 @@
+# vim: ft=tcl ts=4 sw=4 expandtab:
+
+tcltest::loadTestedCommands
+
+tcltest::test pub-sub-1.1 {message is not evaluated} -constraints {
+    serverIsRunning
+} -setup {
+    set r1 [retcl new]
+    set r2 [retcl new]
+} -body {
+    set result {}
+    proc cb {type pattern channel msg} {
+        set ::result $msg
+    }
+    $r1 callback "chan" cb
+    $r1 subscribe "chan"
+    vwait result ;# wait for "subscribe"
+    $r2 publish "chan" {[expr {1 + 2}]}
+    vwait result ;# wait for "message"
+    set result
+} -cleanup {
+    $r1 destroy
+    $r2 flushall
+    $r2 destroy
+} -result {[expr {1 + 2}]}
+
