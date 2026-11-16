@@ -658,7 +658,7 @@ oo::class create retcl {
     }
 
     ##
-    # Parse the read buffer. starting at index startIdx. Returns a list
+    # Parse the read buffer starting at index startIdx. Returns a list
     # consisting of:
     #
     # idx   : index up to which the buffer has been parsed
